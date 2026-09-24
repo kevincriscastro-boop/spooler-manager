@@ -1,0 +1,17 @@
+{
+  "auth": {
+    "username": "admin",
+    "password_hash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+  },
+  "stats": {
+    "restarts_auto": 0,
+    "restarts_manual": 0,
+    "total_prints_cleaned": 0
+  },
+  "settings": {
+    "stuck_threshold_minutes": 5,
+    "check_interval_seconds": 30,
+    "port": 8989
+  },
+  "history": []
+}

@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador do Spooler de Impressão - Painel Administrativo</title>  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAIABJREFUeJzs3XeYFdX9BvD3zMwt21iKIMUuRgOIwhYERJdditjQBIgdjTXWn71HlFiwJMYaazQajSUabAjSFZEmdo2xIDYQENh+752Z7++PRdq2ubt37rnl/TxPnifsnjnzStnzvWfOnKNARGlNxvQO1US7dLSVm2eJka9cBARuR0BZotChoZF02v46BckDAIGqadSpUusBQAkqAbEVjA1iIGYrt9o0AtX5hRs3qOc+jvr7X0ZEflK6AxDRtjaOHtzZiMR6wjC6KSU9INIVUN1dQXco1VVBOgLoCIVOEHQEkKMpai2ADb/8T6A2GJCfAKwCZDWUWiOifoTIajdo/Vg4feHPmnISURNYABAlWW354F6O2L0FsqdSxi4KsosAOwGyE6B2BZCrO6NPagH5BsC3ShnfibgrBWqlAr40TPuLvDeW/6A7IFE2YQFA5IN1YwZ1sOrtXyvD7GcAe4tIbwC//E/XJ/ZUVwvIF4D6Qin1peu6n4nCR3bI/KzLtEWVusMRZRoWAETtIEVFgZoOZh9XyUCI9FOG6gsXfaCws+5sGWYlFD4VwUcAPjKU8W7eBvtTtWxZTHcwonTFAoDIIxnfN1i5Lmd/A8ZAQAYCGAigH4CQ5mjZKiIKHyrgXYha7sJ9t0OXuve4OJHIGxYARM2oGTmgp+NYRQYwVIAD0TDgc/o+tcUAfACFBcpVywSyrGDOko91hyJKRSwAiAAIoKrLivvCxMEQdRAUhkHQQ3cuSgCFH+FiPoD5AOblz1nyiQJEdywi3VgAUNaqHlG0L1xVIcDBgBoGoIvuTJQUawG8qRTmiYuZnCGgbMUCgLJG1bABXREIlEHJCLgYw4V6tMlPAOZBMNNU1qu5sxd+rzsQUTKwAKCMJePHm1XrVgwygCMEGAOgP/h3nlomUHgfrnpNDLxSMGzxIjUJru5QRH7gD0PKKHJEUW5VjVGhFA4HcASf41M7rQMwW4l6JWo6UzvPXLZRdyCiRGEBQGmvsqxoBxjmURD5rVIoBxDUnYkyUlSgZkLcf8MwpnaYtXid7kBE7cECgNJSZVnRDoYyD4WS8QKMBhDQnYmyigPgHaXwnDLs57iNMaUjFgCUNn4eUVQYdMyxmwb9QwBYujMRAXABLFQKz7mO+88Oc5et1R2IyAsWAJTSZEzvUFWk0yhAjVeQ3yJzD8qhzBBRwBsQ9VxevvO8enlZre5ARM1hAUApaWPZoAMM0z0Fgt8BKNSdh6gNNgDyLxf4e+HspYt1hyHaHgsAShkbRw/ubETtcVA4G8B+uvMQJdBnAvWYodRj+bMWrdYdhghgAUCaySQYNW+WjBKosyByGPhcnzJbDMArStQDeQcvfoN7DJBOLABIi/Vl+3cMmIGJIjgfwB668xBp8KVAPaRisUcL3ly+RncYyj4sACipNpYNOkAZ7jkKGA8eo0sEAPUC9ZyIc2/hnGWLdIeh7MECgHy3aUveQxVwOYChuvMQpbBlStRdeZXO02rZspjuMJTZWACQb34eUVQYFONkEVwEYBfdeYjSyCpAPSAKd3PHQfILCwBKuA2jSnc3HbkEglMA5OjOQ5TGagH1qO0ad3Sa+84K3WEos7AAoISpHlG0r+ualyrIseBqfqJEchXwmhJjUt6cRct0h6HMwAKA2q2yonQYBFcoyBjw7xSRn0QBr7oit3SYs3SB7jCU3vjDmtqsckTRgYZrXC7A4bqzEGWhBUpwXf6cJbN0B6H0xAKA4lY5ouhA5RqTAFTozkJEWKAMTMqfuWSm7iCUXlgAkGdVI4rL4KobAAzTnYWIGpknSl3bYdbiN3UHofTAAoBaVVVW3A+G+iMaNu8holQmmGko9/K82cve1R2FUhsLAGrW+rIDdrNM50oITgNg6M5DRJ4JgOdd07i68I1F/9MdhlITCwBqpLqspLuYuB6C34Ov8xGlsxiAhxGzr+N5A7Q9FgC0mRxRlFtVY56nIFcB6KA7DxEliqoGcEd+6Oeb1bQvIrrTUGpgAUAQQFWXl45TkFsF2E13HiLyzf8AdXXB7MXP6Q5C+rEAyHKVFaXDlMidAAbqzkJEySGC15VpXlQw851PdWchfVgAZKmaYUU9nIA5RUFOAP8eEGUjGwqPImpfw/UB2Yk/+LOMFBUFajoaZ4vgBvA5PxEBPyuFG/KcvHvV3Lm27jCUPCwAskj18JIKUbgHwD66sxBRyvkQhpxfMHPpXN1BKDlYAGSB9WX7d7TMwBQITgf/zImoeSJQT0Lhwg6zFq/THYb8xcEgw1WWlxyhgPsB9NKdhYjSxiol6vL8OYv/oTsI+YcFQIaqGVbUww0ad0PwW91ZiCg9KeAVwzX+kDt30Xe6s1DicXvXDCOAqh5eepIbMD7i4E9E7SHA4Y7hflRdUXKBTOJ4kWk4A5BBNpQX7WnCeBBAue4sRJRhRL0l4pzeYe6yz3RHocRgAZABpKzMqjFrzoHgRgHydOchooxVD6gp+V1qblLPfRzVHYbahwVAmqsaXtIXBp6EYH/dWYgoa7wLwzyBOwmmNz7TSVMCqKrhJWdAYTEHfyJKsoFwnXerK0ouEH6QTFv8g0tDVaOGdFN27BEBDtedhYiynMJ0I+qekvfmsh91R6H4sABIM9Xlg0aJch+DoIfuLEREm/wkSp3aYdbiV3QHIe9YAKQJKSsLV5s1UyA4D/xzI6LUI1B4KD/XvVC9vKxWdxhqHQeSNFA1vKQvlDwFqP66sxARteIT5eL4/LlL3tMdhFrGRYApTABVXVFyARSWcfAnojTRRwwsrCwvvZybB6U2zgCkqKphA7oiYD4JqFG6sxARtYVAvQaFk3iwUGpiAZCCakYUDxBXvSDAbrqzEBG1i+BbV8m4wtlLF+uOQtvi9EyKqS4vPtF11QIO/kSUERR2NqDmVVaUnqo7Cm2LMwApQsb0DlVHO90Kwfm6sxAR+ULhwfzOtedxG+HUwAIgBdSWD+7lKPt5CA7QnYWIyE+isDQg9ric2cu/0Z0l27EA0KyqvOQgAM8A6K47CxFRkqxRgmPz5yyZpTtINuMaAI2qhpecAWAmOPgTUXbpKgqvV5aXXq47SDbjDIAGP5X1zc8xch8BMEF3FiIizf5VY0VO6z7jgxrdQbINC4Akqxk5oKfrWC8DGKg7CxFRapAPTEsdnjtjybe6k2QTFgBJVD2iaF9xjVcA7KI7CxFRivnBMOTwvJlLl+sOki24BiBJqiuKR4prvAkO/kRETenpusb8muHFh+oOki1YACRB5fDi34uoVwEU6s5CRJS6JN9VampVeelZupNkAxYAPhJAVZWXTlJKPQIgoDsPEVEasAC5v6qi5K88TMhfXAPgExnTO1Qd6fQogON0ZyEiSk/q+fw68yS1cGGd7iSZiAWADzaOHtzZiNkvAjhIdxYiojS3EDF7bMGby9foDpJpWAAk2Ibyoj1NGK8C2Ft3FiKiDPGlKHVoh1mLP9cdJJOwAEig6rKS/cXADABddWchIsowq5UyRuXPWvSB7iCZggssEqSmrLRYDMwEB38iIj/sKOLO21g2iIemJQhnABJg04E+rwAo0J2FiCiTKaAGgrE8SKj9OAPQTjXlxWMAvA4O/kREvhMgTxReqh5eOlp3lnTHAqAdKstLjnChXgCQozsLEVEWyRUlL1UNL/6t7iDpjAVAG1WXFx+rgBcAhHVnISLKQkEo9Ux1RelE3UHSFQuANqgsLzldoJ4EYOnOQkSUxUwR+XtVefG5uoOkIxYAcaqqKD5HAQ+Av3dERKlAAequ6orSi3QHSTccxOJQWVF8FUTdA749QUSUSpSI3FE5vORK3UHSCQcyj6qGl5wPhb/qzkFERM0Tkcs6zFl6m+4c6YAFgAeV5SWnKOAR8PeLiCjVCZT8oWDW0gd0B0l1HNBaUV1RcoIIHgcflxARpQtXKZyUP2vJP3UHSWUsAFpQWVF6lBJ5DlztT0SUbhxAHVswe/FzuoOkKhYAzaiuKB4pol4GENKdhYiI2iRqiBydN2fpa7qDpCIWAE2oHF481FBqugB5urMQEVG71MGQQwtmLp2rO0iqYQGwnY3DiwYZyngD3NufiCgjKKDGFRndYc7SBbqzpBIWAFuprhjUX8SdA6Cz7ixERJRQGwy4FXmzl72rO0iqYAGwSWVF6a+UyFsAuurOQkREvvjJdZ2hhXPf/UJ3kFTAAgBAZUVpFyXyNoBf6c5CRES++hIxe3DBm8vX6A6iW9a/2y5lZWEl8hI4+BMRZYM9YQVekLKyrD/JNasLAAFUtVHzCIAhurMQEVGSKDmw2qh5XCZl9xiY1f/xNRWlUwAcpzsHEREl3YTqeaWTdYfQKWvXAFSWl56mIA/pzkFERFqdXTB7yf26Q+iQlQVAdUXJISJ4Gdzil4go29kKxmH5sxfN0B0k2bKuAKgqK+4HQ70FoFB3FiIiSglVStSw/DmL39cdJJmyag1AzcgBPaHUa+DgT0REWxSIktdqR5XsrDtIMmVNAbBm6NAC1zGnQSGr/oCJiMiTno6NqatG9c+aM2CyogAQQIVD0UcA1V93FiIiSlkD8uzQE5Ilj8ezogCoKi+9DMB43TmIiCjlHV1TUXqh7hDJkPFVTlV5aTkg08EV/0RE5I0NQ0Zm+hHCGV0A1I0o2sV2jaXgAT9ERBSfn0zXKMqdu+g73UH8krGPAKSsLBxzjefBwZ+IiOLXzTXkeRnTO6Q7iF8ytgCoUdX3KKBEdw4iIkpPAhlUHel4p+4cfsnIAqCqovhMUepU3TmIiCjdqbMqK0ozcjzJuDUAG4cXDTKUMQ9Axk7bEBFRUtUbrhqWN3fxUt1BEimjCoCqUUO6wY4tA7CT7ixERJRRViJmFxe8uXyN7iCJkjGPAGQSDNixp8DBn4iIEm8Xsax/ZNImQRlTAFTNL70UQIXuHERElJmUwiE15cUX6M6RKBlRydSUFw10YSwEENSdhYiIMlpEiRqUCScHpv0MgBxRlOvC+Cc4+BMRkf9CouQpGTw4R3eQ9kr7AqC62vwzgH105yAioqzRpzrHuVV3iPZK60cANeXFY1yoV5Hm/x1ERJR2RICxHWYveVl3kLZK24Fz0yt/HwDYUXcWIiLKSmuUi/75c5es0h2kLdLyEYAASmz77+DgT0RE+nQVE4+l66uBaVkA1Awv/j8FOVR3DiIiynKC0dXlpefqjtEWaVe1VA0v6QuFpQDCurMQEREBiChllObPWvSB7iDxSKsZABnfNwiFf4GDPxERpY6QiPOEFBUFdAeJR1oVANXr8q4C0E93DiIiom2p/tWF5mW6U8QjbR4BVJYV7aMMYzn46Z+IiFJTBMoYWDBr0Se6g3iRFjMAMgmGMoyHwcGfiIhSVwjiPiyT0mNsTYuQ1fNLzwEwVHcOIiKiVgyunl96hu4QXqT8I4C6EUW72K7xEYAC3VmIiIg8qDRdo2/u3EXf6Q7SkpSfAbBd425w8CciovTRwTWdv+kO0ZqULgCqK0qOB3Ck7hxERETxEFGHVZWXjtedoyUp+wigsqK0ixL5BEA33VmIiIjaYJUbsPoWTl/4s+4gTbF0B2iOcuWvUBz8iYg2MwyY+/SB6tQFqtuOUJ13gOpQCBUMAaGG/ynThNTWArYNqasF6uvg/rQasm4tZO0auF9+3vB1Sobupu3cBuBU3UGakpIzANUVJYeIYJruHEREqcQcNBQ5N/2lXX1EH70f0X/+PUGJyAMB1IiC2Ytn6w6yvZRbAyDj+wZF8FfdOYiIUk2gYnS7+7BGjElAEoqDAuRvMqZ3SHeQ7aVcAVC9Lu9SAL/SnYOIKKWEwjCHHNTuboxddoPRmz9ik2yvmkin83SH2F5KFQC1ZYN2UpArdecgIko11tCDoHJyE9NXeftnEig+AvyxZuSAnrpzbC2lCgDHcP8sQJ7uHEREqcaqSNzUfWDEIYCRUj/+s0GB41hTdIfYWsr8DagqLy0HkNLvTBIR6aAKOsAqLk1cf126wtx3QML6I28UcHzV8JKDdef4RUoUADJ+vAnInbpzEBGlImv4SMBK7FHzVgIWFFLcFBT+nCqHBaVEiOq1K04FsK/uHEREqciPwdo6qAIIBBPeL7VqYM2bpSfqDgGkQAHwU1nffBiYpDsHEVEqUt26w+y7X+L7LSiAVTo44f1S60TkxlWj+mtf76a9AMgxcq6AoIfuHEREqSgw4hBA+bNnm1VxiC/9Uqt65Tmhi3WH0FoA1JYP7gWoC3VmICJKZX6+smcNHgaVl+9b/9QCweW1o0p21hlBawFgi30jgMS82EpElGSqyw4IXXINzOJBvvRv7rs/jN339KVvAEAwCGv04b50bey5F0KXXANjr3186T8D5LoxuU5nAG1nAVSVFfeDod4DYOrKQETUVuav+yF8/RSoLl0BAO5/P0X0qb/DXjAfELf9NwiFkXvXw77v2icbN6D2DxMhq39MSH9mn30ROP4UWIOGNjy6iERQf8efYM+anpD+M4wDw9y3YOY7n+q4ub4CoLxkKoAjdd2fiKitrFGHInzhVUCw8Sp695uvEX36cdizpwOO06b+1Y49EL7qBpj9Er/4rynuqh8QmXw1nM8+bnMfZtEgBI87Geb+RU1+P/rME4g+dG9iiqOMop4vmL1Yyx44WgqAjeXFpQbUO7ruT0TUVsFjTkLwtHNaXZjnrvoBsWeeQOz1l4FotPWOlQFz/4EIHHIErLIRCX/vv1UicJYtRmza1IZZjJiXzArWkIMQOO5kmPv0bbW5PXs66qdcD9h2AgJnDHHFHVw4Z9miZN9YywBcVV48G1DDddybiKhNlELwtHMQPOakuC6TdWsRff4p2C+/AKmrbdxtbh6sw45C4KjxMLqnxlbxUlWJ2GtTEXvxGcianxo3ME1YZSMRPHZi3GsUnEULUHf9FUAkkqC0mUBmFMxemvSdmZJeAFQPLx0tSl5P9n2JiNpMKYQuuByBI37T5i6kqhL2tJdgv7MAsn4dVLcdYQ0eBmvUYVC52l8Jb5ptw35zNuy5M+F++w1UXj7M/QbCOuwoGD16tblb58P3UH/l/zVZEGUtZZQXzFo0J6m3TObNAKC6vGSRAInb1JqIyGehM89HYMIJumNkFGf5UtRd9X/eHo9kh7cLZi8ZmswbJvU1wJry4jEc/IkonQRPPI2Dvw/MAcUIX3MjYPJFsE2GbDoUL2mSWgC4UFcn835ERO0ROPK3CJ58hu4YGcsaejBCF16pO0YKkRuSebekFQDVFSWHAEjq9AYRUVuZA0sQOvcS3TEyXmDMkQiMO053jFQxNJmzAEkrAMTlp38iSg9G9x4IX/0nTk8nSejM82GWDtEdI0UkbxYgKYsAqyuKR4qoGcm4FxFRuygDuQ88AWPPvXQnySpSVYnaU4+BrFurO4p+hgwvmLl0ru+38fsGACACPuQhovQgLmTdGt0psk99PWTjRt0pUoOoK5JxG98LgJqKkhJu+kNE6ST6xCO6I2Sd6LNPAnZMd4zUIBhdM3xQ03sqJ5DvBYDLT/9ElGacTz6E8+F7umNkDancCHvaS7pjpBQX7qV+38PXAqByePHeAMb6eQ8iIj9En3pMd4SsEXv+Ke4KuD2FcRtHDvJ1IYqvBYCh1OV+34OIyA/O4rfhfv6Z7hgZT2prEHvped0xUpFp2HKxnzfwbXCuLivpLsDxfvVPROS36NOP646Q8WJTn4dUVemOkZqUTKwaNqCrX937VgCIibMBND4sm4goTdhvzoG74ivdMTJXNIrYi8/oTpHKwrCss/zq3JcCQMb0DkHA/TOJKL2Ji9izT+pOkbFi06byvf/WKJwrZWVhP7r2pQCoinY+AcCOfvRNRJRMsVmvw131o+4Ymce2WVx5061G1U7wo2PLj06VyHl+9EtElHSbBqrQ+b6/lRU/Owb3h+/hfrcSqKuF1NUBrgsVzgFyc2F07wFj512BkC8fINvFnj2DhZVHouT/APwj0f0mfCvgqopBwyHu7ET3S0SkTSiEvKdfhirsqDeHHYOzbDHsZYvhvLe0YX2C47R8jVIweu4Ec7+BMAcUwzxgGFRubnLytqD2tGPhfv2l7hjpQ1BWMGfJvER2mfgZAHHPTXifREQ6RSKw356PwJgjtdze/fYbxKY+B3v2DMjGDfFdLAL3+2/hfv8tYq9NBUJhWAcejMARv4W57/7+BG6F+/UXHPzjpXA2gNQtAGqGFfVwgSMS2ScRUSqQb79J+j3db75G9PEHYc+fA4ibmE4j9bBnTYc9azrM/gMQnHgGzP1933V2G+63K5N6vwxxdM3IAT3z3lj+Q6I6TOgiQDdgngkgkMg+iYhSQl5+0m4l9XWIPng3as84Hva8WYkb/LfjfLAcdRf/AfV/uiapByCp3Lyk3SuDBFwncEoiO0xYASBlZRYgpyWqPyKiVGLuNzAp93FXfIW6s09G9JknANtOyj3tOTNQe8rvGoqNJDD69ANCoaTcK7PIGTJ+vJmo3hJWAFSrmiMB9EpUf0REqcLYbQ+Yffv7fp/Y9FdQ+4eT4H7zte/32p7UVKN+8lWIPni3bzMOv1C5eQiUjfT1Hhlql6qfvxmTqM4S9whAyZkJ64uIKIUExh8PqIS/NLWN2AvPIHLbZCAa9fU+LRJB9JknUH/DVUDM3xzJ+D3NRAbchO0MmJDf/dqyQTs5hrsCQMKmJqgFlgXVpSuUwXOWiLYnNdWQyo0J60917IS8f70MBPzb2Tz6xMOIPvagb/23hTX0YIQnTQF8/DlTd8nZcJYv9a3/DOWYFnbPnbHk2/Z2lJC3ABzT/T2Eg7/vLAvBiacjMHY8VBIXJBGlA+ej9xB79p+wFy9MaL/WiDG+Dv6xl19IucEfAOwF8xD5y80IXXSVb5/UA2PGsgCIn2nHcAKAm9vbUbsLAAFUteCk9vZDrQtfPRnWQRW6YxClFnERue9OxF74ly/dBw453Jd+AcB5/11E7rrVt/7bK/baVBi790bgN7/zpX/rwDKovHxITbUv/WcqpXCKALcoQNrTT7vndqorBpUB2LO9/VDLzJIDOPgTNSH24rO+Df7mfkUwdu/tS9+yYT3qb7wWcP1dcNdekQfugvvfT/zpPBSCpWlzpTS3V9WIoqHt7aTdBYCIJPS9RGqaNXiY7ghEqce2Ef3HQ/70HQojdM5F/vQNIHLPHUl9977N7Bjqp1zv2yuJweNPgdqxhy99ZzJDzHaPve0qANYMHVqgIL9tbwhqnSrspDsCUcpxPv4AUlWV8H5Vt+7IufVuGHvulfC+AcB5dwnsOTN86dsP7jdfI/r8U770rToUIufP98PY+9e+9J+pRDBh1aj+7dpRqV0FQE4wdjQA/adKZAO+LkPUiLviq8R1ZpowSwYjfMUk5D3xb5j99ktc31sTQeRvd/rTt49i/3wUUlXpS99G957Ivfcx5Nx8J6zyUSl5emHqkfx8O9iu5yftWgQohhzXviUIRERt5367ot19GLvtAWvkoQiMOgyqc5f2h2qFvWgB3C//5/t9Ek1qaxF74RkEJ57uzw2Uglk6BGbpkIbDl955C/Ybr8FesjBpOyKmH3UcgKfbenWbC4CqUUO6wY5xVRoRaeOubNsBPcYuu8EqHw2rYjSMnjslOFXLYs8+mdT7JVLsxX8heOxEIOjfa5EAGhYHHlwB6+AKyIb1sOfNhD1rOpxPPgSEnzp/IcDoyrKiHTrMXba2Lde3fQYgFjsGyofjhImIPJLvvZ8qp3boCmv4KAQqRsPYax8fUzXP/fF7OB8s13LvRJCqKthvz4dVNiJp91QdOyEwdjwCY8fDXfUj7Nmvw541PbGPf9JXQBnmOAB/a8vFbV4DoJQ6rq3XEhG1mwjcdes8NQ0c+Vvk/etlhM66QNvgDwD2zGlp/wnWnjlN272N7j0QPO4U5D7yL4QuuUZbjtQibR6L21QAbBhVurtAStt6UyKi9pKNGzzvV2/ssReg9G+d7Sx+W3eEdrPfXeL7OQFemHv4sz9DGjqwdlTJzm25sE3/IoyYOw4JOkeAiKgtZJ33x56qyw4+JvFGamvhfP6Z7hjtF6mH8+nHulNAdemqO0KqUK6D37TlwrYVAMrgu/9EpJVs3OC5rZECg4X7308yZjW788mHuiNAders60FF6UQEbRqT4/7dqy0f3IvT/0Skm0TqPbdVnTv7mMQb99u2vbGQimTlCt0RANOE6lCoO0WqGFozckDPeC+KuwBwlc3pfyLSL44CAMGQfzk8yqQCIGX+W1LgzzVFGK5tHRX3RfFe0NapBiKiRJK6Os9tVVj/znLxPLJIdany36L83o8gnaj4x+a4CoCqYQO6AhgS702IiBIurhmAFBgo6mp1J0gYSZX/lhBnALZy0MbRg+N61hVXASAB6zAAZlyRiIj84HVBnWmmxCuAkgKvziVMJKI7AQBABVKgsEsdlmnbY+K5IK5/FUrh8PjyEBH5xOvzX8cBXNffLB6oTDrgJidHdwIAgKRIIZIqROSweNp7LgBkfN8gBKPij0RE5IM4pn8lmgIDRW7mHJyqctt1Cm3ipMKfa0pRh0pRUcBra88FQM26/DIABW2JRESUaHF9ok6BT4pGZ/2bESVKKmysBKRIYZdaCqs7qaFeG3ufAYDD6X8iSh1h79PQ8bwx4Be18666IySMsdMuuiM0qI9jIWiWEFd5fgwQx2l+xhggvQ+xoKbZM6dB+A+J0kw876LLz+uA7j18TNM6Y9fdtd4/kYxd99AdAYhFIdVVulOkHAUcCuBSL209FQDryw7YDXB48kKGijx4d1z7qhOlG1n7k+4IMPfaGyqcA6nXPxvRXmb/AbojwF23Nu1PVvRJn9pRJTvnzljybWsNPT0CsAz3kPZnIiLSIyUKXCsAo19/3SnaTXUohLHHnrpjpERRl6psGyO8tPO4BkBGticMEZFOzruLIT+t0h0D1pCDdEdoN2vwMO37KkhVFewF87VmSGXK45jd6p+ijB9vAihrbyAULTTIAAAgAElEQVQiIl3st+ej5tgjUfuHkxB74RnIhvVacljlo4E037zGGhXXq+aJE4vCfuct1E+ZhJrfHYbYs0/qyZEW1EiZ1Pr43uoagMo1K0sMA/qP0iIiaif3888Q+fwzRB64C1bpYFgVo2ENPihpW8qqgg6whgyDPW9WUu6XaEaPXjD3S+Lzf9eFs3wJ7FnTYb85B1Jbk7x7p7cdaucX7Q8se7elRq0WAIYhFYnLRESUAuwY7Lfnw357PhAKwTrgQFijDoNVfABgxfFyVBsEjzsF9vzZabmALXDMSUmZ/ne/+Rr2jFcRe+O11Fi/kYYcZY4A0L4CAJCDE5SHiCj1RCKw582CPW8WVKfOsIaPRODo38HouZMvtzN6/wpm6RA4ixb40r9fVNcdERjt3/S/VG5E7KV/w37jNbjfrfTtPllDcDCAW1tq0mIpJ2VlFoADEpmJiChVyfqfEXvhGdSePB6xqc/7dp/QWRcAlucdW1NC6A//59v6Befdxag96TeI/v1vHPwTREEO3LSGr1ktFgCVqCsGt/8lomzjOIjcfRvsBfN86d7YZTcEJ5zgS99+MEsOgHWwP0+D3ZUrUP/HyyBV3NQnwTrUrvtqv5YatFgAKIPT/0SUpUQQfegeQPw5STB40qkwfrWPL30nkurYCeFLrvWt/+gTD0Pqan3rP5uJqBbH8NZWc6T/S6tEXlgWrGHDETr7QoQuvBLB350I1XVH3alIM/fbb+C81+I6qrYLBBG+9iao/BSeZFUGwldMgtqhqy/dy8YNsOfP8aVvAkS1PIY3uwhQJsGoni+eTxUiSldGz50Qvv5WGHtsu9t18PdnIfLwfYg9909NySgVxKa/AnNAsS99Gz13QviGW1F3xQVANOrLPdojdN7FMEsG+9a/PWs6YMd865/UMAGUauYgn2ZnAKrnFvcBUOhbLqIUoPILkHP7vY0GfwCAFUDorAsQOPK3yQ9GKcOePxtSVelb/+Z+RQhfNdn31w/jFTzxNATGjvfvBiKIvfYf//onAOhSNbz4V819s9kCQAyDq/8p4wV/fxbUji2fEhc8/VyonNwkJaKUE6lH7OV/+3oLa9hw5Ey+HSqOI459oxRCZ12A4Mln+HobZ+k7cL/+0td7EGC0MJY3WwAoyCB/4hClBmP3PRE4/DettlO5eTAHliQhEaWq2H+e832q2iwdgpw/3w/Vrbuv92mJys1F+Jo/ITD+eN/vFX2Wj9aSQcSNvwAA3/+nDBc6+yLAbPE12c1UNy4IzGaybi3sJe/4fh9j7z7IffBJLYcGGb1/hZz7HodV5v/Zb7L6RzjLl/h+HwKgVHwFwJqhQwsA/Nq3QESaWUMPjutTvWzY4GMaSgfufz9Jyn1UQQeEJ9/e8IaAT6vvt7lfTi5CZ56P3Hsfg7Hzrr7fDwCczz9Ly62Q05Jg35/K+uY39a0mV52EQ7ESAN4+GhGlm0AQwbMu8N4+FuWnFQJcf/YDaI5VNgLmoCGITX0eseefgqz/ObE3CIUROOI3CE44AarLDontuzUc/JPJzLFyigHM3f4bTRYAolCs+OdDGSo47ti49nmPvfofbcfHUuoweu+d9HuqnFwEjzkJwaMnIDZ3JuwZr8J5f3m7Nicy9twLgVGHwRoxBqpjpwSmjSND72YXppMPlBgD4bUAUCJJPO+RKHlUlx0QOO4Uz+2lqhLRxx/yMRGlA9WxE6xBGrdFCYURGH04AqMPh6xbC2f5EjjLl8L532cNe+dHIk1fZ1kwevSCsedeMPcrgjmwBMZOuyQ3exOMnjvB3Hd/OB++pztKVnCbGdObe/GUBQBlpOCpZ0Plen+lL/rYg5DKjT4monQQ+M0xQCikOwaAhiLWGjEG1ogxDV8QgaxdA6mugtTVAa4DlZMLlZ8P1aVryu0v8IvgcSej7sr/0x0jK6hmxvRGfzM2LRbYy/dERElm7LUPAqMO9dze/eZrxF55wcdElA5Ubh4CY8fpjtE8paC6doPq2k13kriYpUNg/GofuJ9/pjtKNthHjijKVS8v2+bQhUYFQNgK7w+31TMCiOKiOnVGYNxxsIoHAXn5kFU/wp77BmKvvwzYdhICKITOvxRQ3v9qR+79c9PZTBOB0YfDGj4KqkdPoKYa9rLFiP37aci6tQkMTakgMHZcau/Xn8aCx0xE/Q1X6o6RDczKauwLYNHWX2xUACjXHNDMtsFEbWLuuz/Ck2+HKuiw5Ys9esEcUAxr1GGov+pCSLW/R4Fa5aNh9tnXc3v77flwli1q9HWVm4fwjX+G2X/bGbVg770ROOwo1F93GZz3lrU7L6WIUAiBccfpTpGxrIOGw9h5V7jffqM7SsYzlDkA2xUATXwcEu8/JYlaYf66H8I337nt4L/19/v2R+jy63zNoMI5CJ1+rvcLYlFE//bXJr8VuvTaRoP/5vvkFyDnpr/A7Ld/W2JSCgocOlbbSvmsoAwEjp2oO0V2EOm3/Zeamg/tm4QolAWMPXojfPNfW91H3xpykK/nogeOOSmu56PRF56B+/23jb5u7NEb1kHlLV8cCiN805/T4px3aoVlITjhBN0pMl6g4pBWz+OghGg0tjdVAHAHQGo3Y6ddkHPrPVAF3p6dWgP82Wtf7dgjrh/i8vM6xJ58tMnvmQNLvd0zLx85t9wFY9fdPd+XUk9gxBit+/JnDctCcIL/Zw9kPYWWZwBqRg7oCYDzXdQuqlt35Nx2D1Snzt4v8mmRVejM8+N6fSv66P2Q2pomvxfPQjBV2BE5t90Do0cvz9dQClEGAsecpDtF1giMGRvfzwtqix2qhg3YZm/pbQoAcU1O/1O7qM5dkHP7vXF/cpIfv094FrP/AFgHV3hu737+GWKvv9Ls9+PNqLp0Rfi2e5Kynzsl1i+L0yhJuNgyOSyrz9a/3O4RgOoDojZSBR2QM+VuGL12ju/CSD3st+cnNoxhIHTOxd7biyBy7x0tbrFqL3wTUlfb7PebjNGjV8OjkMKOcV1HGimF4HEn606RdQJH/tbzI0Nqs20+5G87AyDClUvUJio3F+Gb74SxR++4r408cn/C99oPjDkyrv3G7Tkz4Hz0fottpHIjog/dE3cWY9fdkTPlLqi8Jg/kopSj4P60WneIrCPr1gIuX0H3lVLbrPHbdgZAVPw/vYmsAMJ/vAXmrxutMWlVbOpziP376YTGUbl5CJ58pvcLIhFEHr7PU9PY1OcRfeaJuDMZe+2D8C2tvxFBKUBcRG7+I9yvv9SdJGtIbS3qJ10OqanWHSWjCWTPrX+9TQGgFFgAUHwsC+Hrp8AsOSDuS+0ZryFy9x0JjxSceDpU5y6e20effhyy+kfv7R+6p01bBJt99kX4hluBYDDuaym5pLYW9ddczHMgkkFcRG68Bu6Kr3QnyXgK247xmwsAGdM7JECcD28pqxkGwldeD+uAA+O+1J4/C/W33dCuY02bjLTzrggcNd5ze/lpFaLPxvmJXgSRO2+FPWt6nOkaXiUMXzUZMM24r6Xkclf9gPrJVwGxqO4oGS1y352w33lLd4xssbsUFQV++cXmAqCqrnB3APypRN4ohdAFl8MqGxn3pc6yRai/6TrATezgDwChP/wfYAVab7hJ5IG7mj9KtSXiov6W62DPnxX3pdaw4Qhf9se4ziUgPZx3l6B+8tWA4+iOkpGi/3gIsRf+pTtGNrE2FmLzedBbfgKZJqf/ybPQWRcgcPjRcV/nfLAcddde6sunKrN0CMw4zmx3PnwP9rz4B/DNXBf1N18H590lcV9qjRiD0HlxvKVA2tgL5iFyx42AJHCBWjT9ZhWkvi6hM3ax/zyL6OMPJaw/8saSLWP95sOADMieXH9JXgRPPLVN7+y6//0U9VdfBETqEx/Ksho+/XslbsNpf+39oR6Nov6PlyJ86z0w+8S3CDIwdjykuhrRR+9vXwbyXWz6K0AwiNAFl7V55sb976eI/vtpOO+8BamphupQCGvowQgcNR5G770TnDgx3FU/IPbis7DnzGhYpW+aMPsPQODIcbCGlbX59yL2yguI3PPnxIYlT8RwewOYDmxVALiidlU8BZBaYRYNQnDiGXFf5674CnVXnN/sLnvtFRg7HsYuu3luH5v2Mtz/JeYccqmrRf1VFyDnjr/B2HOvuK4NHncynI/eh7P47YRkIf/EXn4BUlON8OWTAKvRQarNct5bhuhTjzU6XVIqNyI27SXEpr0Ec78iBI6eAGvwgXE9wvKFCJwPliM29TnYb87Z9lGd48BZvhTO8qUwdtkNwWMnwiofHdfvR/TpxxF95L7EzqiQZ8rd8ghg85+a4gJA8iB4/MmAUnFd4/7wHeouO8+3FdWqYycETzrNc3upSfynbqmqQt3l5yHnzgdh7LRL6xf8QikEjz8ZdSwA0oI9ewbqamqQc90tLW8xLQL7nbcQe+oxOJ982Gq/zvvL4Ly/DKqwI6yKQxD47TEwuvdMYPLWSVUlYi//G/a0l+H+8F2r7d2VK1A/5XoYjz+IwIQTERhzZMtvuIgg+tA9bXqNlhJHlGq8BkBB4vipRVnJMOI+6lbW/IT6S8+BrFvjUyggeMqZce3TH33yUcj6nxOeQ9b/jLpLzonrlUIAMPv01/+pjzxzFi1A7YVnQtb81Pibrgt71nTUnn486q+52NPgvzXZuAGxF/6F2onj2vSqaVs57y5G7Ym/QfSR+z0N/ltzV/2IyF23oub4sYg+8wSktondMiP1qL/xWg7+qWHzh/0trwEqzgBQKwLBuF9fc95bCnf1Kp8CAcaeeyFw6FGe27vfrUTshWd8yyNrVsNetji+iwwDKo4Di0g/97+foPbsiVt2j4xFEXvlRdROHIf6m66F+/UX7buBbSNy55TEb5HdBHflCtT/8TJIVWW7+pGf1yH64N2oPe4IRB97cPOMn6z+EbXnnw57zoxExKX2ku0eAUhRUaBasKO+RJQWIvWQNauhunr/q2KNPBTBTT8Y/BA65yLA8L4QKXr/nYAd8yULAARPPgOBQ8fGdY2sW8sd0NKQ/LwOdRefjcBhY2G/NS/xs1wiiD5wV8O6AB9fGY0+/lDcZ1y0RKqqEH3iYcSefwrWiENgvzkn4Vt9Uzso9JSyMkvNnWsbALChINALjQ4GImos9sZrcV8T/N2JCB5/SsKzWAeVw9yvyHN7Z8k7vm44Ehh/PIInel+L8IvYzGk+pKGksGOITX3et0dc7ncr4Xzwni99Aw3P/e235vrTd11tw8JJDv6pxqwL1vQANg36puEkd7UJpa3YU4+3acvO4O//gMDRExIXJBhE8Mzzvbe3bUTu8++1o8DhRyMUT55N3O9WIvbkoz4kokxhz45/x0nPfc+b5euMGKWmWMztCWz+1K84/U+eSF0t6q44H+6qH+K+NnTOxXFPjzcnOOGEuFZJx6Y+B3flioTce3vWQeUIXXB53G9HyNo1qL/cv1cjKTPY82b6th2xPet1X/ql1KY2jflGwy+ku944lE4aVvaf27AxSDyUQujCK9u0ffA23ezQFYFjTvLcXqoqEfXpU7Y15CCEr/5TXOsQAEA2rEfdZee2qZCi7CJVVbCXvJP4fteshvNhy0dgU4ZSWxUAnAGgeLk/fIe6y9vwbv/mA4S8b9m7vdDp58Z1rG70kft82YPAHFCM8LU3xbUJCtCwD0HdlRfA/ebrhGeizNSWg6daE5s9I+GHcVF6UMDWBYDLAoDi5n79JeouPQdSXRXfhZaF8B9viWsB3y/MPv1gVRziub274ivEXpsa93285AhPvj3+o30j9ai/+iK4nydmF0LKDvbb8xL+qIjT/9lMugGcAaB2cr/4HPVXXdhwUEg8QiGE/3Q7jL37eL9GKQTPuTiuZ+2R+/6S8JPcjD16I3zTnXHNQgAA7Bjqrrsczof+reqmDBWNwlkwL2HduStXwP3yfwnrj9LN1o8ARHXVmoXSmvPxB6ifdEXcq4lVbh5ybvkrjJ139dTeGjkG5j59Pfdvvzmn0f7r7WX03Ak5t90LVdAhvgttG/XXXwlnycKE5qHsEUvgJ3b7Db56mtUEW80AKOmkNQylPWfJQtTfeO22B4d4oDoUInzNn1rd6ETl5CJ02jneO45GEX3grriytEophK/5E1THOP+5iIv6KZOSsqsbZS7n3SWJ2cJaBPZsTv9nNYVOwJbNfzpqjEIZwp4/G/W3TY77lC+j994wB5a02CZw3ESoLt4nqqLPPwX3x+/jytEas//A+B5ZAIBIw5aus7kNKrWT48CeO7P93Xz8AdxV8Z1XQZlFoDoCWwoAzgBQQtgzXkXknjvivs7s06/Z7xndeyI47njPfcm6NYg99VjcGVpj9t037msiD9yF2CsvJjwLZadELNzj4j9SaJj1t2R832D1OsS5momoebH/PAuVm4vgqWd7v6iF0/CCZ10Q12r7yMP3JnRv883M+F73i/7jIcSe+2fic1DWcj79CNWjh0J17gKjazeozl2gCjsCpgWVkwMEAg0HdtXXQ2KxhvM76mohP62G/LwO7to1QKRe938G6Vcg48ebVvXGwo4At4KkxIo+9RiQm4fgsRM9tW/u9DRz/yJYw4Z7vq/z2ce+LXByV3zpuW3s+acQffwhX3JQlrNjkJ9WwfnJv1M2KeOpysrvCg1XnELdSSgzRR++F7Gpz7XaTtathfPOgsbfMAyEzrnY+w1FEL33jrjXIHhlL3676TPgtxN7bSoif/urLxmIiBJBYtFOhuXYBbqDUOaK3H0HYtNfab6B46D+tslN7iMQOPxoGHv09nwve9brcD75qC0xvYlEUH/rDYBtt5gh8pebfStCiIgSwRIz33BE5egOQhlMXERum4zIA3c1OvPeXfEV6i45u8l341VBAYInn+n9NvV1iDx0T7vjtsZ5dzHqLv5Do0cWUluD6EP3oP7m6+J+FZIo5QTi3OGS0o4jKscyDOTywwr5SgSxZ59E7MVnYe7dB6qwEO4P3zf73B8Agied3rC4yaPYU49B1vpzJvv2nI/eR+1px8HYfU8YPXeCbNwI5/NPgKg/J7YRJZs1aAjst+bqjkE+MgzJtVwXuXGeYkrUNrEonI9a3wbX2GU3BI4c57lbd9WPiGpYbe9+/SXcr70vDExnZr/9YO5fBOTmQX74Dvbb8yE/r9Mdi3ygCjrAGnowC4AMJwq5ljKQA84AUAoJnX1RXCfsRR+4i5++faI6dkL46skwB5Zu8/XQ2Rci8vB9iL3wL03JyC/Bk04DwnwynOmUIMcQl3sAUOqwDjgQZskBnts77y+DPX+Wj4myWDCInCl3NRr8AQChMELnXITA2PHJz0X+UAqBCScg8JtjdCehJFAKuZaCCusOQgQAUAaCZ5znvb3rInLvn/3Lk+UCR46D0XvvFtsETzsH9uzpkKrKJKWihLICMHrtBLNvf1hjjoTZJ/7dLik9iSDHAhDf9mZEPjH77gtj1909t4+99h8eaeoj6+CKVtuo3FyYpUO4vawOwSCM3fZoeOukpgZix4BfXqcNhqCCoYap/IAFlZcPtUM3GJ27QO3QDWrH7jB23R1Gj14NOwdSFnItSxnKEr4GQCnA2G0Pz22lugrRvz/gYxoyuvf01q5nL5+TUFNUx87Ivf8fumNQmlJKmYbruiz/KCVIHAv5ok88Atmw3sc05HkhZpxnJBBRSrAMKMUCgFKC+/EH3tqtXIHYf571OQ0RUeZyoUxDgQUApQb3+29hL5jXciNxEbn79ha34yUiota4lgElLAAoZUTuuLH5zXVEEH3oXjjvLk5uKCKiDKNcZRq6QxBtTTZuQN25v0f0iYchq39s+KIdg/PeMtRdfj6izzyhNyARUSYwoCyIcsCtACmFSH0doo89iOhjDwKhEBCNAcIDdoiIEkUgtiUQh0cBUMqKRHQnICLKPGI4BkQc3TmIiIgoeQwltmEYBgsAIiKibCLiGABnAIiIiLKJALYhEL5QTURElFWUYwiMet0xiIiIKHkEqDMMcWt1ByEiIqLkUYJaw1VGne4gRERElDyiUGcYojgDQERElEUMQa3lGnatcrkjMBGlqUAQgUMOhzloKFTHTpC1a2C/OQf2nBmAyx0kiZriGqrWMh2rzlX8R0JE6cfo3gPhm/8KY5fdtvm6NWw4nLHjUH/tJZCNG/SEI0phhiN1hmNIle4gRERxswII33Rno8H/F2bf/ghfe1NyMxGlCQdOtaFMi+UxEaWdwMgxMHbdvcU25oBimMWDkpSIKH0o01pv5BdyfoyI0o9ZMthTO8tjO6IsIgVO7kZDPfdxFADfBCCitKI6d/HWrssOPichSjtVau5c+5fl/5wFIKL0ojweZK74lhPRdjYAAAsAIiKi7LIe2FIArNcYhIiIiJJnI7C5AJA1OpMQERFR0qwGAAsAIMZqKNGahtKMacIaPAxm3/5Abh5QVwvnk49gvz0fsGNt6tLYfU9YQw6C6rqj9+e7mSgagfv1l7DnzYLUVOtOQ1tRObkwiwfB6LkTpL4ezvvL4K74SncsovgIfgJ+KQAgq3VmofRi7Lo7wpOmNNqAJQDA/f5b1F9/Bdwv/+e9QyuA0PmXInDo2Owe+LcTPOM8RG6bDHvBPN1RCIA1fBRC510CVdhxm6/bb85B5I4/Qaq4pxqljdXAljUALADIE9WlK3Juv6/Z3deMXjsj57Z7obp199xn6KIrETjsKA7+21EFHRC+7haYA4p1R8l6VtlIhK+e3GjwBxq2HQ7fchcQCGpIRtQmWxcAnAEgb4Inndrq+9eqsCNCp5zlqT/z1/0QGH14IqJlJtNE6NxLdKfIbqEwQudd0mKBau7TF4EjfpPEUERtJ5vGfAMAxGQBQN5YB1V4amcOKwOM1t+/NocNb2eizGfstkezMy7kP6t4EFTHTq23qxidhDRECWAYW9YAuC5+NPXGoTSgwjlQHQq9tc3JhepQCNnQ8humxo7eHxVkM7VjD2DlCt0xksLo0Qvm/kVAXj5k1Q9wli6C1Ndpy6N69PLUzui1i89JiBLDNbEK2FQAFIY2flcd6SQA+BCWmiWReiASAUKh1hvbNqS69RXssnFjApJlPqnM/L26VDgHoQsugzVyzDa798nGDYjcczvs2TP05Ap6e7avggGfkxAlhFO4zvkO2PQIQE37IgI0vBZA1CwR2Evf8dTUWb7U0+uAjsf+spms/xnu//6rO4a/DAPhybfDGnVYo617VWFHhK+aDKviEE3hiDLKKrVsWQzY8hYABFipLw+li+g/HgJi0ZYb2Taijz/oqT974VtwPv4gAckyV/TvfwNcV3cMXwVGHQZzYEnzDZRqeAUvNy95oYgy0+axfnMBoIBv9WShdOJ+8Tnq/3RN889ko1HU3zIJzqcfeetQXNRPuhzu558lLmSmEEH0yUcRe/U/upP4zsune1XQAeagoUlIQ5TRNo/1VlNfJGqJ/dZcOCdPQGDsOJj99oMKhSHRejgffwj7pefhrvoxrv7k53WoPe/3CIw8FOaQg2Ds0M2n5OlBbBvu118g9up/4P73E91xksLYaWeP7bjQjqg9tp7t31wAKKVWinA7YPJG1qxG9OF7E9ehbSM27SXEpr2UuD4pfXjdRIcL7YjaRcmWD/ubHwG4ADe0JiIiymAu1Je//P8tawAc9ws9cYiIiCgZFLaM9ZsLgPxI4EsAmb3UmIiIKHs5BTvUff3LL7bMACxcWAfgBy2RiIiIyFdKsFI99/Hm97itbb4r+AIKOyU9FRFRMlkWAqMOgzVsONQO3SCVG+Esfhuxl/4NqavVnY7IF6KwzaP+bQuAhm+WJTEPEVFSqY6dEL7xzzD36bvN1839i2AdOQ71V14AN4HnLhh79EbgkCNg7LpHwyuen32E2CsvQtb/nLB7EHkjX279q20KAKXwGd8EJKJMFr7mxkaD/y+M7j0QvukvqD31WCBS3+57BU88FcGJp2+7vfEBQxGYcAIiN14D+50F7b4HkWeiPt36l9sWACKfCM8DIg9Ut+4IHDUeZt99oYJhSDQC97OPEXvxWbir2rCUZNOUrDn0YBidd0h84DQitg33m69gv/of7zsqkifmwBKYA4pbbGP06IXAmCMR+8+z7bpX4NCxCJ58ZpPfU7l5CF83BbXnnAz3K76ARcmhTGyzs9g2BYBhyMeuywKAWmYNG47wldcDofA2Xzf77YfAkeNQf9sNcZ3cpjp3Qc5Nf4Gx1z6Jjpq2zD79EDjkCESffgzRR+7XHadNVMdOCBx2FIw+/aECFtxvViA2/RW4X+g72MgsPsBju0HtKwAsC8FTz265TTCI4Mlnov6Pl7b9PkRxUBH3461/vU0BEJ657Nvq8pIqAAVJTUVpw+i9N8JXT25+57ZgEOHLJ6Fu1Q9wPvHw6VUZCF9/Kwf/piiF4HGnQFavQuyVF3WniYtZMhjha2+Eysvf8rWiQQgcPQHRpx5D9FE9RY3RqbO3dp27tOs+5t59oDp2arWdVTIYMIyMP+yJUsL6vDeXbbNP+zbnbipAFPApiJoRPOm01rdttSwEJzY99dmo6eADYfbZNwHJMlfw5DMB09QdwzNjtz2Qc/2UbQb/zZRC8PhTEBg7PvnBGgJ4bGa03qaly7t4fIwVDEJ1KGzXvYg8EfXx9l9q6m95o0ZEAAClYHmdQh1QDFit79vudUo2m6lOnWH0/pXuGJ4FJ57e6PFQozannAUEPe7/n46MOAqINCruKI0Z0uhkscZ/S0U+TEoYSj/BEBAKeWtrmlD5TXwC3I4q5KcfL1SHjrojeKMUzNIhrTcrKODMD1EyiWr0TLZRASAmlicnDaWdSD2kcqOnplJb66mtu3pVe1NlBVkd3xHLuqicXKhwjre2Xbr6nIaIfiHivrv91xoVANGA+S4A7gZATbLnzfLUznlrjqeFTc782e2NlPHcr79M6MY0vjLjmfpu33N2IvLMjURDH2z/xUb/ArtMW1QJHg1MzYg+8TBk3doW28jGDWBEerwAABxVSURBVIj8/QFP/TmffYzY6y8nIlpmchxE7rlddwoiSm//67pgQdX2X2ymBFd8DEBNknVrUXfJ2XC/+brJ77vfrUTdpedAfvI+tR/5yy2IvfICwG0otyGVG1F//RVw3lumOwoRpbcmx3SrqS+KcpcrUeP8zUPpyl25ArWnHwfrgANh9O3f8LpXbQ2cTz6EvfBNwLbj69CONRQBLz4La8hBUF13jG8VdaaJRuB+9QXs+bMhNdW60xBRmhPV9If6JgsAwzWWieKnMWqB48BeMA9YMC9hXborvkJ0BZ8+ERElkgG3yQKgyY9ZMYkuAsCtqYiIiNKbxBx7SVPfaLIA6DT3vQ0APvc1EhEREfntk01jeiPNPmhVwDv+5SEiIqIkWNjcN5otAARqkT9ZiIiIKBlaGsubLQAMw2UBQERElMaUSPwzALl2/ocKqPEnEhEREflsY/7BS5o94bfJ1wABQM2da1cNL1kIhRH+5KKMYJpQubmQurr43/9vhsrNy+ptYiUSAaJR3TE8U6EQVEFBw//PK4jjuvDm66C8HdOrglvu5fkUvUBgyzXB1k+o/KXvLdd4PbVQbfl98HgeAoCGfTSiEQCA1NUDdszztUQtEagFalLzb/S1+K+uqrzkGgCTE56K4hb+482wDq7wpe+aCYe2ur3v9qyDyhEYfwLMX/dpODtdBO7nnyL63FOw58yIO4PRoxeCE0+HObQMKjc37uszjfv9t4i98iJiLzyjbUDIe/ENnlWvgfvl/xB78ZmGLbJb2B1TdeuOvKdf8iWDPX826q+/wpe+KXkE6ooOsxdPae77rX3Mmp/gPJQBgmech/B1t8Ds069h8AcApWDs3Qfha/6E0HmXxNWf2acfcv72D1gjD+Xgv4nRa2eEzjwfOVPuiuMTKGUCY8+9ELrkGoSvvGHLvy+iNhBXtbhTW4t/u/JD6xcBqE9oIkpr1rDhCP7uxBbbBI6aAKviEE/9qXAOwpOmQOV7nzrOJub+RQiderbuGKSBVTEagaMn6I5B6au2Q9fqRkcAb63FAkBN+yICgG8D0GaBCS0P/r9orUj4hVUxmufCtyJw5DioHM6MZKPghBM8r48g2s4C9dzHLS4man1+SZC4zd4pvZkmzH36eGpq7LmXp4VQRp9925sq8wWDMHr/SncK0kB17dZwOBZR/Fp9hN96AaAwKyFRKP2ZZnyn9AVaX3GtAny+7UkwlPx7RiLJvyc1orgGhNrAdY2ZrbVp9ad5/kZ3IYDKhCSi9BaNwv3xe09NZd0aSFXrf23cb3j6X6tE4Go4JdH95uuk35O2JXW1cFev0h2D0s+GDshZ2lqjVgsAtWxZTPFtANrEfs3ba0exaS97azfzdSCWPu+86+AsWQhZtybp941Nm5r0e9K2bP77oLZQmKXmzm11YxZP87kieKP9iSgTRJ//J5xPPmyxjfu/zxB7+nFP/cnqHxF54K5ERMtIsmE9In+9Vcu97XmzYM9tdRaRfOJ+/y2ij9ynOwalJfE0ZnssANz4d3ahzBSNov6y8xB7bSrgbrfBlLiwZ7yKuovPhtTXee4y9uKzqL/p2rg3I8p0zvKlqDv393BX/aAngAjqb7oW0X/+nesBkkkE9vzZqDv/NE+P0Yi25yjlqQDw/H5JVXnJNwB2aXMiapdU2wkQAFRhR5i/7guEwkAkAuezjyEb1rc9iGnC/HU/qC47tL2PTGDbcFd8Bff7b3Un2Uzl5sLos2/DtrXkn1gMzuefQta2/siHOwFSM74smL2kt5eGzZ4F0Ji8Bqiz2pqIMo9s3AD7nQWJ69Bx4Hz0fuL6o4SR2lo4S7klCFHKU3jVa1PP73S5YrzStjRERESUDArieaz2XAB0qDdnA6htUyIiIiLymarOC27w/Nae5wJALVxYp8BNgf6/vXuPj6su8zj+fc4kLc3MJGm5CLhQcNmVFV3opklFoE0aQOUiiuAugvcFxQsuXgBhhcpFQPAGKKwKqFyWJbQsloq0yUzohZKZTAPFFtRWrlKg0Ka5Nsmc37N/0K6lFshMZuY5Z+b7/tOX53c+L18155lzJSIiCiTRB7e9wn9ccvrUlCp4GYCIiCiAVMd//R/IcQDwqrL3A3jjD1QTERGRBec5PJDLBjkNANElPS8IJJVbExERERWVysOxznRO743OaQAAAKdufq7bEBERUfGI5H5szn0AqPbuAS8DEBERBYVG4N+b60Y5DwD1i1NPAXg01+2IiIio8ASSmpLoeSbX7XJ4E+Drdjcf0Bn5bUtBM+n0z0CHx//ufiKyJzVR6wQKiHwvzec1AKjz54vnXZ7PthQ81Sedap1ARER5cqIL8tku50sAAFDbmXkSAF/aTkREZEiBdH0isz6fbfMaAABAVe/Id1siIiKaOA96Z/7b5ilS5d8BwL3lf5GIiIiKwXmobst347wHgOiSnhcALMt3eyIiIpqQjprEyr/ku3HeAwAAQJH3qQciIiLKnwL/PZHtJzQA+GOT2wCM+8tDREREVBBbs57L6+7/7SY0ANQvX74ZkIUTWYOIiIhytmBae2bLRBaY2CUAAJ66Wye6BhEREY2feJjwsXfCA0DNnO7fQfHcRNchIiKicXk+OvWA5EQXmfAAIPPgxMPtE12HiIiIxkNulrY2f6KrTHgAAADf824FvxBIRERUbOrDv60QCxVkAKhb0vUnAMsLsRYRERG9oWS+r/7dWUEGAAAQlZsKtRYRERHtSuGOtQUbAKJ7DN4D4OVCrUdERESv82Jsi/+/hVqscGcA2taMCib+WAIRERHtit4smcxYoVYr2AAAABFkbwQw4TsTiYiI6HVc1lX9opALFnQAmJLoeUYhDxZyTSIiokonwKKpnY88Xcg1CzoAAIAqflroNYmIiCqZQG8s9JoFHwBqk6nfAniy0OsSERFVqD/WzO4u+Nn1gg8AAiigPyn0ukRERBVJ9AcyD67QyxZ8AACAWFRvAbCpGGsTERFVkM2DkdGivG5firEoAAy0Nn1PVb9ZrPUrjXfgQZCp06wziKgCaO8muD+vs84gACK4MtaRvrAoaxdjUQAYPrph/6zz1gOoKtY+iIiIythYxHnvqOnser4YixflEgAATGnPPAtoW7HWJyIiKmequLNYB3+giAMAAIhErgK/EkhERJQrFdVri7mDog4AsY6u1argi4GIiIhyszDe2f37Yu6gqAMAAEhEry72PoiIiMqJqn6v2Pso2k2AO+qf27gCwPtKsS8iIqKQWxpPpOcUeydFPwMAlGaSISIiKgeelubMeUnOACggA3MbewAcWor9ERERhdSqWCI9U0pwA31JzgAIoFBcWop9ERERhZWKXFKKgz9QojMAQHmeBZDaOkRmzLTOICIKPH1lI/w1q60zgq5kv/6BEr6lTwDtV70MIveUap/F5v3dftjt4iutM4iIAi+74iH4F/Pt8G+mlL/+gRJdAtguluxeAOCxUu6TiIgoBFbFO1KLSrnDkg4AAqhCvlPKfRIREQWdU7m4lL/+gRIPAABQm0jdC2BlqfdLREQUSCrL65Kl/fUPGAwA21xgtF8iIqKA0f+02KvJABBPpJcCWGKxbyIioqAQ0UXxZPohi31bnQGAp963wC8FEhFR5VIRfNtq52YDQDTZlQFQNo8EEhER5UbvirZ391jt3WwAAAC/Ss4HMGLZQEREZGBr1lVdaBlgOgDUL049pao/sWyYEF7AICIaH+UfzB0J8KOpnY88bdlgOgAAgK/ZywC8Yt2RD+3bYp1ARBQK2rvZOiFINo567irrCPMBYGrno71QXGbdkQ/3ykZAnXUGEVHg6SsbrRMCRC6e1p4x/wVpPgAAQKzP3Qjgj9YdORvZCv+JNdYVRESB5/d0WycEhD4RczW/sK4AAjIASCYzJirnWHfkI7s0YZ1ARBRo+upG+Gv5JUAAEJGvSWdn1roDCMgAAACxZOpBES35qxAnKrtwAfTVUN7CQERUEqO/vhlwvFwKYEGsI/0764jtAjMAAEBW9asAtlp35EK3DmPkpz/gHa5ERLvgr30cYw/cZ50RBMN+lXzDOmJHgRoA6hOZ9YB+37ojV9nOdozecat1BhFRoOhLG7D1kvMA37dOsSe4qn5x6inrjB0FagAAgNhw9RUKeca6I1ejt96EkR9eCWQDcWmHiMiUv/b3GPrK56CbXrVOCYJnYzXuWuuInYl1wK70tzSeDMF86458eO84CJPP/DIiTe+zTiEiKjndvAmjt92MsUX38gfRNipyYm1H6n7rjp0FcgAAgP65jQsAfMS6I1/ytn1Q9b6j4O1/IGSPPSG77WadRERUeE6hm1+F2/gy/J40/MdW8ZT/jhT/E0+m/806Y1cCOwAMHtWwj6v21gCYat1CRESUh00i3rtiHV0vWYfsSuDuAdguuiyzAYoLrDuIiIjyocDXg3rwBwJ8BgAAFJCBuY1LALRatxAREY2fJmOJ7lYJ8GfjAnsGAAAEUBfxzgYwbN1CREQ0TkM+9MwgH/yBgA8AAFC3pOtPClxq3UFERDQeIrj4tffaBFvgBwAAiLvotQBWWXcQERG9KcGjUT/6Y+uM8Qj0PQA7GmhpOlRF0wCqrVuIiIh2IevBzYomMqH4wRqKMwAAEEumHhORH1l3EBER7YoIrgnLwR8I0QAAANEafx4g66w7iIiIdvLHqB8N1f1qoRoAZGFmyHM4DcCYdQsREdE2Wafuk9LZGaqv2YZqAACAaGeqG4rLrDuIiIgAQIFv1yUzXdYduQrdAAAAsTnpK6DotO4gIqKKtyy++wHXWEfkIzRPAexs6NjG/fwsHgO/FUBERDZ6q5A9bEqiJ3SfsAdCegYAAGoWp58D5PPWHUREVKFEzw7rwR8I8QAAAPFEqk2B2607iIiosghwa7yj+y7rjokI9QAAAFvd0Nl8NJCIiEpo/fDIpK9aR0xU6AeAvTrXDKi6TwPIWrcQEVHZyzrnnbHnihX91iETFfoBAABqk90rALnCuoOIiMqbil5S19n1iHVHIZTFAAAAMVdzOYCHrTuIiKhsPRSfduDV1hGFEtrHAHdl8KiGfdwkLwPFPtYtRERUVl70ItmG6JKeF6xDCqVszgAAQHRZZoMqTgFfFUxERIUzpiIfK6eDP1BmAwAA1CbSD4vIBdYdRERUJkTPre1ILbPOKLSyugSwo77Wmb8SlU9adxARUYgp7ogn02dYZxRD2Z0B2C4+VP0FAD3WHUREFFa6OhZzZ1lXFEvZDgCycuWwc/7HAPRatxARUehs9qEny8LMkHVIsZTtAAAAdZ2r1qnIJwA46xYiIgoN50FPr09k1luHFFNZDwAAUNuRuh+Ky607iIgoNC6JJrofsI4otrIfAAAgNif9HRFdZN1BRETBJsDC2Oz0d607SqFsnwLYWe+RR06NTBpZCeCd1i1ERBRE+sSYp4dPa89ssS4phYoZAACg99imAyNZXQngbdYtREQUKK845x9e17mqYr4uWxGXALarX5x6yhOcCKBs7+okIqKcDTvnnVhJB3+gwgYAAIh2pNNQ/ST4ZAAREQFOIaeXyxf+clFxAwAAxJPd8wU437qDiIhsieBrtYnUvdYdFirqHoCd9c9tuh7QL1t3EBGRAZX/iidTX7DOsFKRZwC2i+0+/T8gcp91BxERlZaILortMf1L1h2WKvoMAADoiQ01g4NeUoEm6xYiIiqJzGDVyJy9F68etA6xVPEDAAAMHtWwj6v2HgGwv3ULEREVjwBPw+HwWGf6ResWaxV9CWC76LLMBvHcCeCHg4iIytlmFe94HvxfwwFgm1h75nHnvA8C6LduISKiwhJgUD33oXhH11rrlqDgJYCd9LXMPMITeVCBqHULEREVxDA8PS7e3t1pHRIkPAOwk9pk9wrAOxnAiHULERFN2KhTOZUH/7/FAWAXYomuxQo5DUDWuoWIiPLmQ/GJumSKX4PdBQ4Ab6A2kbpXoJ8FXxlMRBRGqqpnxZPpu61DgooDwJuIJbpvU9UzAah1CxERjZsC8sXaZPct1iFBxgHgLdQmu28RwbnWHUREND6qen48kbrJuiPoOACMQ6wj/WNA51l3EBHRW1BcXJvsvsY6Iwz4GGAOBuY2XqnABdYdRET0t0RwZawjfaF1R1hwAMhR39ym8wV6lXUHERH9lQBXxxJp/kDLAQeAPPS3zvwSVK4H//cjIrKmIvKNWEfqB9YhYcMDWJ76WxrPguBG8D4KIiIrCug58UT3DdYhYcQBYAIG5s48TSG/AlBt3UJEVGF8EflcrCP1K+uQsOIAMEF9cxtPFOBuALtZtxARVYhRKE6LJ9MLrEPCjANAAQy0Nn5AFQsATLFuISIqc0OicnIsmXrQOiTsOAAUSF9r01Giej+AWusWIqLyJAMAToonUgnrknLAAaCABltmNThxDwLY3bqFiKjMbHbOO66us+sR65BywTvYCyia7MpAvNkCPG3dQkRULkTxFLzIETz4FxbPABTBQHPj3s7DbwRotG4hIgozAVIQ70Oxjq6XrFvKDc8AFEGsM/3iUNVIC0Tus24hIgqxe6NR18KDf3FwACiSvRevHoxNm/5RCK6zbiEiCh3BdbHZ6VNkYWbIOqVc8RJACQy0Nn5VFd8HELFuISIKOB+Qc+OJ1PXWIeWOA0CJ9LXMPElE7gRQY91CRBREAgw64LTaRHqhdUsl4ABQQgMtTYeq6CIAb7duISIKFMEGz5cPRTtT3dYplYIDQIkNzT387T6yiwAcat1CRBQQa6qQPX5KoucZ65BKwpsAS6wmsfIvW0cmHQXBfOsWIiJrAizMurEjefAvPZ4BMKKA9M9tOk+gV4A3BxJR5fEBuTw2O3WpzIOzjqlEHACM9bfOaoG6uwDsZd1CRFQirwq8j8cSXYutQyoZB4AAGDq2cb9sFvP55kAiqgA9fpV8tH5x6inrkErHewACoGZx+rm4i84W1ZutW4iIikUht8WGq47gwT8YeAYgYPpbGs+C4HoAk6xbiIgKZEQE58c60j+2DqG/4gAQQIPNTTN9D/cIdLp1CxHRBD3vnHcqv+QXPBwAAmqguXFv9fROQFqsW4iI8qJoRzb78fiyno3WKfS3OAAEmAIy2Np4jiq+B14SIKLwGAPku3zEL9g4AITAYMusBifuDgDvtG4hInoLT3pwp0cTmVXWIfTm+BRACESTXZnYcNUMflqYiIJMIbcNVo3M5ME/HHgGIGT6Wps+LKo/B7CHdQsR0TYbVfXfa5Pdv7EOofHjABBCA62z3uZUbxHocdYtRFThFO1eVfZT0SU9L1inUG44AITUDjcIXg1gsnUPEVWcEYVcEp+duoY3+oUTB4CQG2huPEw93A7gEOsWIqoYj4t4Z8Q6ulZbh1D+eBNgyMU604/GtrgZCrkAwIh1DxGVtTEBro5N3tzIg3/48QxAGdlyzKx/8LLuZxA0W7cQUdl5GOKdGe/oWmsdQoXBAaDMKCADLY1nQnAtgLh1DxGFmwCDDnIZr/WXHw4AZWrwmBn7Or/qBgAfsW4honBSyG+rPf/sKe2ZZ61bqPA4AJS5/rlNpwJ6A4C9rFuIKDReEpXzYsnUr61DqHh4E2CZiydSbf7o5IMh+BkAte4hosBrU+fezYN/+eMZgAoyMHfWsQp3PYB/tG4hosBZC8hX4olUwjqESoMDQIXRhobqwXrvi6q4FECtdQ8RmduskKvjuw/+UNrWjFrHUOlwAKhQg8fM2Nf3q68S6BngvwOiSpSF4BaMZv8zvqxno3UMlR7/8Fe4/pbGOfDwIygOs24hopJZAsW58WR6jXUI2eEAQK+9O2Bu0ykKXCPQ6dY9RFQssg7AhfFEqs26hOxxAKD/pyc21PQPRr4i0IvAlwgRlQ0BBhVybWzypivlgXV8ZTgB4ABAu7DtJULfAfBpAFXGOUSUvzEIbhV4F8c6ul6yjqFg4QBAb2hz83sPqIr434Lis+AgQBQmDsB8F/EuqlvS9SfrGAomDgD0lvqaGw6GF7lQoB8HELHuIaI35ADMV9Vv1ya7/2AdQ8HGAYDGrb+l8RAILgFwCvhvhyhYFO1eRM+Ltnf3WKdQOPCPOOVs4OiG96jzvg3gVOsWooqnaPdUvhXtTHVbp1C4cACgvG1pnvXeiOcuUuAE6xaiCrQCioviyfRD1iEUThwAaML65zbOVuACAT4A/psiKiYHkYUq/rW17Znl1jEUbvxjTQUzcHTDe5yLfFOgp4FPDRAV0ohC7haRq+IdXWutY6g8cACggus9tunAiK/fgOIzAKZY9xCF2CtQ/BTV1T+JL374ZesYKi8cAKhoNh3dUDdJvU+rw9ch2M+6hyhE/iyC66I17ueyMDNkHUPliQMAFZ02NFQP1EU+DOi5AA637iEKsIyoXBfdY/od0tbmW8dQeeMAQCXV1zLzCBF8CZCTAUy27iEKgBEA81XkhtqO1ErrGKocHADIxObmw+qrI9WfUsU5AN5h3UNkYL1Cfi5jY7fEl/VstI6hysMBgEzpPHhDS2e+34n3eageDz49QOVtDNBFot5N0TmpJTIPzjqIKhcHAAqMLe8/fJo3mj0Fgi8CONS6h6iAnlTILz2RX/KrfBQUHAAokLY0z3qvF3GfgeJfAdRZ9xDloRfQuxxwa12iO2UdQ7QzDgAUaPrBgyb3j0w9FpBTBfpRADXWTURvYkSAJVBpi8b8e/gIHwUZBwAKjU1HN9RN8iMnQfRUfe21w7xfgILAAVgpgjYHub22I/WqdRDReHAAoFDqa23a3XM4ftsw8H4A1dZNVFF8AI+IoE1G3d3RZZkN1kFEueIAQKHX19q0O5w7CSKnCNAKYJJ1E5WlERFtdyrztbrqvroHV26yDiKaCA4AVFb0xIaa/kGvVQQnQHECgH2tmyjUXgGQFJX7RyP+fdPaM1usg4gKhQMAlS2dB6+vc1aT5/knAHIcXnu00LPuokBzAHoAPOCgC2tnd3fzWX0qVxwAqGL0NTfsIV6kBaJHQ/EBAPtbN1EgvAhgGRTtXlX2/uiSnhesg4hKgQMAVaz+1lnvgmorROdAcRSAvaybqCReArAU0KXqtL22M/OkdRCRBQ4ARNtsGwhmA242ILMBvN26iQrieQBLIboUUrU03v7IE9ZBREHAAYDoDQweM2Nf369qEEgDVI+A4AgAU6y76E2NAVgNwQpxkslGdHl9e/rP1lFEQcQBgGictKGheqjeO8xB/wXOmyGiMxR4DzgUWBkW4HFV6QF0leehp6bXPSqZzJh1GFEYcAAgmgBtbq4awMDB4mEGFO+Gh0Pg5F0qOAD8/1ehqCiehmANVNfCk8fVoSem0T9IZ2fWOo4orPgHiqgIXjz2n6Px0d3+SSM4BKoHK+QgiB4ElYMAjVn3BVQ/gHWArBfoOqg8IYq1/ZO2PrH34tWD1nFE5YYDAFGJDTQ37u2q3EGeRv5eodOh2A+C/aDYT4DpCkStG4tDBgB9VhXPiuA5CJ4XJ087uPWeF1nHz+QSlRYHAKKA6T3yyKmR6pF9EdE9xff2had7quqeAtkXwB6qMhWi9QDqAam3O6MgA4D2AtgMoFeAXohsVHUbRGQjVF9WDxvgy0Z/bPIL9cuXb7bpJKJd4QBAFHLa3Fw14G+Z6k+uikfU281zmOLgYhJBtarWQz0RuN1U5XU3K4poDQCoytBO//mwwtsKcSoivepjzIM34DwM++K2elnXF0e8l9fficLt/wAFp1ECFeHEewAAAABJRU5ErkJggg==">
+
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --bg-card: rgba(22, 29, 47, 0.75);
+      --bg-card-hover: rgba(30, 41, 67, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: #3b82f6;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.3);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.12) 0px, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+    }
+
+    /* Navbar */
+    header {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .dot.down {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      transform: translateY(-1px);
+    }
+
+    .btn-action-force {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
+    }
+    .btn-action-force:hover {
+      background: linear-gradient(135deg, #d97706, #dc2626);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(239, 68, 68, 0.45);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Cards Grid */
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+    /* Os cards da Frota agora têm foto + specs, então precisam de mais
+       espaço horizontal do que os cards de métricas (mesma classe base). */
+    #machines-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+    .stat-card.c-purple::before { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+    .stat-card.c-amber::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+    .stat-card.c-green::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
+    .stat-card.c-blue::before { background: linear-gradient(90deg, #3b82f6, #6366f1); }
+
+    .stat-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 2.3rem;
+      font-weight: 800;
+      margin-top: 10px;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Actions Bar */
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding: 20px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .actions-info h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .actions-info p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* History Table */
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 36px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 14px 18px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .pill-auto {
+      background: rgba(139, 92, 246, 0.15);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .pill-manual {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Modals & Login View */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #111827;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 440px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-box {
+      max-width: 400px;
+      margin: 80px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 36px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.4);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--primary);
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+      display: none;
+    }
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+    .alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Abas (Este Computador / Frota) */
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* Cards de máquina da Frota */
+    .machine-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: border-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .machine-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+    .machine-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .machine-host {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: 2px;
+    }
+    .machine-details {
+      margin-top: 14px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .machine-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 0.82rem;
+    }
+    .add-machine-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .add-machine-form input {
+      max-width: 220px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELA INICIAL (publica, sem login - status desta maquina) -->
+  <div id="view-home">
+    <header>
+      <div class="nav-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#fff">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+          </div>
+          <span>Spooler Manager</span>
+          <div class="status-badge" id="home-badge-spooler">
+            <div class="dot" id="home-dot-spooler"></div>
+            <span id="home-txt-spooler">Verificando...</span>
+          </div>
+          <div class="status-badge">
+            <div class="dot"></div>
+            <span>Monitor 5 min: Ativo</span>
+          </div>
+          <div class="status-badge">
+            <span id="home-txt-version">Versão: -</span>
+          </div>
+        </div>
+
+        <div class="user-menu">
+          <button class="btn btn-primary" onclick="showLoginArea()">🔐 Área de Administração</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <h3 class="section-title"><span>Status desta Máquina</span></h3>
+
+      <div class="grid-stats">
+        <div class="stat-card c-purple">
+          <div class="stat-label">
+            <span>Reinícios Automáticos</span>
+            <span>⚡ > 5min</span>
+          </div>
+          <div class="stat-value" id="home-val-auto">0</div>
+          <div class="stat-desc">Executados por fila travada</div>
+        </div>
+
+        <div class="stat-card c-amber">
+          <div class="stat-label">
+            <span>Execuções Forçadas</span>
+            <span>🖐 Manual</span>
+          </div>
+          <div class="stat-value" id="home-val-manual">0</div>
+          <div class="stat-desc">Disparadas pelo usuário / painel</div>
+        </div>
+
+        <div class="stat-card c-green">
+          <div class="stat-label">
+            <span>Impressões Limpas</span>
+            <span>🗑 Total</span>
+          </div>
+          <div class="stat-value" id="home-val-cleaned">0</div>
+          <div class="stat-desc">Documentos expurgados acumulados</div>
+        </div>
+
+        <div class="stat-card c-blue">
+          <div class="stat-label">
+            <span>Fila Atual</span>
+            <span>📄 Agora</span>
+          </div>
+          <div class="stat-value" id="home-val-queue">0</div>
+          <div class="stat-desc" id="home-val-queue-desc">Trabalhos aguardando impressão</div>
+        </div>
+      </div>
+
+      <div class="machine-card" style="margin-top: 24px;">
+        <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+          <div style="flex: 0 0 auto; width: 180px; height: 150px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <img id="home-photo" alt="Foto do equipamento" style="max-width: 180px; max-height: 150px; display: none; border-radius: 12px;">
+            <div id="home-photo-fallback" style="width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 16px; font-size: 52px;">🖥️</div>
+          </div>
+          <div style="flex: 1; min-width: 240px;">
+            <div class="machine-name">🖥️ Este Computador</div>
+            <div class="machine-details" id="home-specs" style="margin-top: 12px;"></div>
+            <div class="machine-details" id="home-details" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">Consultando informações da máquina...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- TELA DE LOGIN -->
+  <div id="view-login" class="container hidden">
+    <div class="login-box">
+      <button type="button" class="btn btn-ghost btn-sm" style="margin-bottom: 8px;" onclick="showHomeView()">← Voltar</button>
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="brand-icon" style="margin: 0 auto 14px auto; width: 48px; height: 48px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#fff">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.4rem; font-weight: 800;">Painel de Controle</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Gerenciador do Spooler de Impressão</p>
+      </div>
+
+      <div id="login-error" class="alert alert-danger"></div>
+
+      <form id="form-login" onsubmit="event.preventDefault(); handleLogin();">
+        <div class="form-group">
+          <label for="login-user">Usuário</label>
+          <input type="text" id="login-user" value="admin" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Senha</label>
+          <input type="password" id="login-pass" value="admin" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 8px;">Entrar no Painel</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <button type="button" class="btn btn-ghost" style="font-size: 0.8rem; padding: 6px 12px;" onclick="checarAtualizacao()">🔄 Verificar Atualizações</button>
+        <div id="update-check-result" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA PRINCIPAL DO DASHBOARD -->
+  <div id="view-dashboard" class="hidden">
+    <header>
+      <div class="nav-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#fff">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+          </div>
+          <span>Spooler Manager</span>
+          <div class="status-badge" id="badge-spooler">
+            <div class="dot" id="dot-spooler"></div>
+            <span id="txt-spooler">Spooler Ativo</span>
+          </div>
+          <div class="status-badge">
+            <div class="dot"></div>
+            <span>Monitor 5 min: Ativo</span>
+          </div>
+          <div class="status-badge">
+            <span id="dash-txt-version">Versão: -</span>
+          </div>
+        </div>
+
+        <div class="user-menu">
+          <button class="btn btn-ghost" id="btn-dash-update" style="display: none;" onclick="atualizarAgoraDashboard()">⬇️ Atualizar Agora</button>
+          <button class="btn btn-ghost" onclick="openModalPassword()">🔑 Trocar Senha</button>
+          <button class="btn btn-ghost" onclick="handleLogout()" style="color: var(--danger);">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="tab-bar">
+        <button class="btn btn-ghost tab-btn active" id="tabbtn-local" onclick="switchTab('local')">🖥️ Este Computador</button>
+        <button class="btn btn-ghost tab-btn" id="tabbtn-frota" onclick="switchTab('frota')">🌐 Frota de Máquinas</button>
+      </div>
+
+      <div id="tab-local">
+      <!-- Cards de Métricas -->
+      <div class="grid-stats">
+        <div class="stat-card c-purple">
+          <div class="stat-label">
+            <span>Reinícios Automáticos</span>
+            <span>⚡ > 5min</span>
+          </div>
+          <div class="stat-value" id="val-auto">0</div>
+          <div class="stat-desc">Executados por fila travada</div>
+        </div>
+
+        <div class="stat-card c-amber">
+          <div class="stat-label">
+            <span>Execuções Forçadas</span>
+            <span>🖐 Manual</span>
+          </div>
+          <div class="stat-value" id="val-manual">0</div>
+          <div class="stat-desc">Disparadas pelo usuário / painel</div>
+        </div>
+
+        <div class="stat-card c-green">
+          <div class="stat-label">
+            <span>Impressões Limpas</span>
+            <span>🗑 Total</span>
+          </div>
+          <div class="stat-value" id="val-cleaned">0</div>
+          <div class="stat-desc">Documentos expurgados acumulados</div>
+        </div>
+
+        <div class="stat-card c-blue">
+          <div class="stat-label">
+            <span>Fila Atual</span>
+            <span>📄 Agora</span>
+          </div>
+          <div class="stat-value" id="val-queue">0</div>
+          <div class="stat-desc" id="val-queue-desc">Trabalhos aguardando impressão</div>
+        </div>
+      </div>
+
+      <!-- Identificação da Máquina -->
+      <div class="machine-card" style="margin-top: 24px;">
+        <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+          <div style="flex: 0 0 auto; width: 180px; height: 150px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <img id="dash-photo" alt="Foto do equipamento" style="max-width: 180px; max-height: 150px; display: none; border-radius: 12px;">
+            <div id="dash-photo-fallback" style="width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 16px; font-size: 52px;">🖥️</div>
+          </div>
+          <div style="flex: 1; min-width: 240px;">
+            <div class="machine-name">🖥️ Este Computador</div>
+            <div class="machine-details" id="dash-specs" style="margin-top: 12px;"></div>
+            <div class="machine-details" id="dash-details" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">Consultando informações da máquina...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Ação Rápida -->
+      <div class="actions-bar">
+        <div class="actions-info">
+          <h3>Ação de Limpeza Imediata</h3>
+          <p>Para o serviço, esvazia completamente a pasta spool/PRINTERS e reinicia o serviço com feedback visual.</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-ghost" onclick="loadStats()">🔄 Atualizar</button>
+          <button class="btn btn-action-force" id="btn-force" onclick="triggerForceRestart()">
+            ⚡ Forçar Reinício e Limpeza Agora
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabela de Histórico -->
+      <h3 class="section-title">
+        <span>Histórico de Atividades</span>
+      </h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Data & Hora</th>
+              <th>Tipo</th>
+              <th>Motivo da Execução</th>
+              <th>Impressora(s)</th>
+              <th>Limpos</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="history-rows">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 28px;">
+                Nenhum evento registrado até o momento.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+      <!-- FIM tab-local -->
+
+      <!-- ABA FROTA -->
+      <div id="tab-frota" class="hidden">
+        <div class="actions-bar" style="margin-top: 0;">
+          <div class="actions-info">
+            <h3>Adicionar Máquina à Frota</h3>
+            <p>Digite o nome do computador (ex: PRODUCAO-01) ou o IP onde o Gerenciador do Spooler também está instalado.</p>
+          </div>
+          <form class="add-machine-form" onsubmit="event.preventDefault(); addMachine();">
+            <input type="text" id="machine-name" placeholder="Apelido (ex: Linha 3)" required>
+            <input type="text" id="machine-host" placeholder="Nome do PC ou IP" required>
+            <button type="submit" class="btn btn-primary">+ Adicionar</button>
+          </form>
+        </div>
+
+        <h3 class="section-title">
+          <span>Máquinas Monitoradas</span>
+          <button class="btn btn-ghost btn-sm" onclick="loadMachines()">🔄 Atualizar</button>
+        </h3>
+
+        <div class="grid-stats" id="machines-grid">
+          <p style="color: var(--text-muted);">Nenhuma máquina cadastrada ainda. Adicione uma acima.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL DE TROCAR SENHA -->
+  <div id="modal-password" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 6px; font-size: 1.25rem;">Alterar Senha do Administrador</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Digite sua senha atual e escolha uma nova senha.</p>
+
+      <div id="modal-pass-alert" class="alert"></div>
+
+      <form onsubmit="event.preventDefault(); submitChangePassword();">
+        <div class="form-group">
+          <label>Senha Atual</label>
+          <input type="password" id="pw-current" required>
+        </div>
+        <div class="form-group">
+          <label>Nova Senha</label>
+          <input type="password" id="pw-new" required minlength="4">
+        </div>
+        <div class="form-group">
+          <label>Confirmar Nova Senha</label>
+          <input type="password" id="pw-confirm" required minlength="4">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn btn-ghost" onclick="closeModalPassword()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Nova Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let authToken = localStorage.getItem("spooler_token") || null;
+    let autoRefreshTimer = null;
+
+    // SHA-256 em JavaScript puro (não depende de crypto.subtle, que só funciona
+    // em contexto seguro - https:// ou http://localhost. Como o painel também é
+    // acessado por http://NOME-DO-PC:8989 (Frota, rede local), crypto.subtle fica
+    // indisponível nesse caso e o login travava silenciosamente sem essa troca).
+    function sha256(ascii) {
+      function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+      const mathPow = Math.pow, maxWord = mathPow(2, 32);
+      let i, j, result = '';
+      const words = [];
+      const asciiBitLength = ascii.length * 8;
+      let hash = sha256.h = sha256.h || [];
+      let k = sha256.k = sha256.k || [];
+      let primeCounter = k.length;
+      const isComposite = {};
+      for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 313; i += candidate) { isComposite[i] = candidate; }
+          hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while (ascii.length % 64 - 56) ascii += '\x00';
+      for (i = 0; i < ascii.length; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return;
+        words[i >> 2] |= j << ((3 - i) % 4) * 8;
+      }
+      words[words.length] = ((asciiBitLength / maxWord) | 0);
+      words[words.length] = (asciiBitLength);
+      for (j = 0; j < words.length;) {
+        const w = words.slice(j, j += 16);
+        const oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = hash[0], e = hash[4];
+          const temp1 = hash[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & hash[5]) ^ ((~e) & hash[6]))
+            + k[i]
+            + (w[i] = (i < 16) ? w[i] : (
+                w[i - 16]
+                + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                + w[i - 7]
+                + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+              ) | 0
+            );
+          const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) { hash[i] = (hash[i] + oldHash[i]) | 0; }
+      }
+      for (i = 0; i < 8; i++) {
+        for (j = 3; j + 1; j--) {
+          const b = (hash[i] >> (j * 8)) & 255;
+          result += ((b < 16) ? '0' : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    async function checarAtualizacao() {
+      const box = document.getElementById("update-check-result");
+      box.textContent = "Verificando...";
+      try {
+        const res = await fetch("/api/check-update");
+        const d = await res.json();
+        if (d.error) {
+          box.textContent = `Versão atual: ${d.current_version || "desconhecida"} — ${d.error}`;
+          return;
+        }
+        if (d.update_available) {
+          box.innerHTML = `📦 Nova versão disponível: <strong>${d.latest_version}</strong> (atual: ${d.current_version}).<br>Será instalada automaticamente às 11h ou 15h.<br>` +
+            `<button type="button" class="btn btn-primary btn-sm" style="margin-top: 10px;" onclick="atualizarAgoraLocal()">⬇️ Atualizar Agora</button>`;
+        } else {
+          box.textContent = `✓ Você já está na versão mais recente (${d.current_version}).`;
+        }
+      } catch (e) {
+        box.textContent = "Não foi possível verificar agora.";
+      }
+    }
+
+    async function atualizarAgoraLocal() {
+      const box = document.getElementById("update-check-result");
+      if (!confirm("Atualizar agora esta máquina? O Spooler pode reiniciar durante o processo.")) return;
+
+      const user = document.getElementById("login-user").value.trim();
+      const pass = document.getElementById("login-pass").value;
+      if (!user || !pass) {
+        alert("Preencha usuário e senha acima para autorizar a atualização.");
+        return;
+      }
+
+      box.textContent = "Iniciando atualização...";
+      try {
+        const hash = await sha256(pass);
+        const loginRes = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, password_hash: hash })
+        });
+        const loginData = await loginRes.json();
+        if (!loginData.success) {
+          box.textContent = "Usuário ou senha incorretos - não foi possível autorizar a atualização.";
+          return;
+        }
+
+        const res = await fetch("/api/force-update", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + loginData.token }
+        });
+        const data = await res.json();
+        box.textContent = data.message || "Atualização iniciada!";
+      } catch (e) {
+        box.textContent = "Erro ao iniciar atualização: " + e;
+      }
+    }
+
+    async function handleLogin() {
+      const user = document.getElementById("login-user").value.trim();
+      const pass = document.getElementById("login-pass").value;
+      const errBox = document.getElementById("login-error");
+      errBox.style.display = "none";
+
+      const hash = await sha256(pass);
+
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, password_hash: hash })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          authToken = data.token;
+          localStorage.setItem("spooler_token", authToken);
+          showDashboard();
+        } else {
+          errBox.textContent = data.message || "Usuário ou senha incorretos.";
+          errBox.style.display = "block";
+        }
+      } catch (e) {
+        errBox.textContent = "Erro ao comunicar com o serviço local do monitor.";
+        errBox.style.display = "block";
+      }
+    }
+
+    function handleLogout() {
+      authToken = null;
+      localStorage.removeItem("spooler_token");
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      showHomeView();
+    }
+
+    // ===================== TELA INICIAL (publica, sem login) =====================
+    let homeRefreshTimer = null;
+    let homeUpdateCheckTimer = null;
+
+    async function fetchLocalHealth() {
+      try {
+        const res = await fetch("/api/health");
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function refreshHomeStatus() {
+      const dot = document.getElementById("home-dot-spooler");
+      const txt = document.getElementById("home-txt-spooler");
+      const details = document.getElementById("home-details");
+      if (!dot) return; // usuário pode ter saído da tela inicial nesse meio tempo
+
+      const health = await fetchLocalHealth();
+      if (!document.getElementById("home-dot-spooler")) return;
+
+      if (!health) {
+        dot.className = "dot down";
+        txt.textContent = "Monitor Offline";
+        details.textContent = "Não foi possível consultar o serviço local. Tente novamente em alguns instantes.";
+        return;
+      }
+
+      const running = health.spooler_status === "Running";
+      dot.className = "dot " + (running ? "" : "down");
+      txt.textContent = running ? "Spooler Ativo" : "Spooler Parado";
+      details.innerHTML = buildMachineDetailsHtml(health, { skipQueueAndStats: true });
+
+      const stats = health.stats || {};
+      document.getElementById("home-val-auto").textContent = stats.restarts_auto || 0;
+      document.getElementById("home-val-manual").textContent = stats.restarts_manual || 0;
+      document.getElementById("home-val-cleaned").textContent = stats.total_prints_cleaned || 0;
+      document.getElementById("home-val-queue").textContent = health.current_queue || 0;
+
+      const versionTxt = document.getElementById("home-txt-version");
+      if (versionTxt && !versionTxt.dataset.updateAvailable) {
+        versionTxt.textContent = health.version ? `Versão: ${health.version}` : "Versão: -";
+      }
+
+      updateMachineCardPhoto("home", health);
+    }
+
+    // Preenche a foto do card de identificacao (compartilhado entre a tela
+    // inicial publica e a aba "Este Computador" autenticada). So define o
+    // src uma vez - se o arquivo nao existir pra essa maquina, o onerror
+    // do <img> deixa o icone generico visivel no lugar.
+    function updateMachineCardPhoto(prefix, health) {
+      const photoImg = document.getElementById(`${prefix}-photo`);
+      if (photoImg && !photoImg.dataset.srcSet && health && health.hostname) {
+        photoImg.dataset.srcSet = "1";
+        photoImg.onload = () => {
+          photoImg.style.display = "block";
+          const fallback = document.getElementById(`${prefix}-photo-fallback`);
+          if (fallback) fallback.style.display = "none";
+        };
+        photoImg.onerror = () => {
+          photoImg.style.display = "none";
+        };
+        photoImg.src = "/photos/" + encodeURIComponent(health.hostname) + ".png";
+      }
+    }
+
+    async function loadMachineSpecsInto(prefix) {
+      const specsEl = document.getElementById(`${prefix}-specs`);
+      if (!specsEl) return;
+      try {
+        const res = await fetch("/api/machine-info");
+        const s = await res.json();
+        if (!s) { specsEl.innerHTML = ""; return; }
+
+        let linhas = [];
+        const modelo = [s.manufacturer, s.model].filter(Boolean).join(" ");
+        if (modelo) linhas.push(`Modelo: <strong>${modelo}</strong>`);
+        if (s.serial) linhas.push(`Número de série: ${s.serial}`);
+        if (s.os_caption) linhas.push(`Sistema operacional: ${s.os_caption}${s.os_version ? ` <span style="color: var(--text-muted);">(build ${s.os_version})</span>` : ""}`);
+        if (s.ram_gb) linhas.push(`Memória RAM: ${s.ram_gb} GB`);
+        specsEl.innerHTML = linhas.join("<br>");
+      } catch (e) {
+        specsEl.innerHTML = "";
+      }
+    }
+
+    async function checkUpdateVersionBadge(prefix) {
+      const versionTxt = document.getElementById(`${prefix}-txt-version`);
+      if (!versionTxt) return;
+      try {
+        const res = await fetch("/api/check-update");
+        const d = await res.json();
+        if (d.update_available) {
+          versionTxt.dataset.updateAvailable = "1";
+          versionTxt.innerHTML = `Versão: ${d.current_version} · <span style="color: var(--warning);">🆕 atualização disponível</span>`;
+          const btn = document.getElementById(`btn-${prefix}-update`);
+          if (btn) btn.style.display = "inline-flex";
+        }
+      } catch (e) {
+        // sem problema - so nao mostra o aviso de atualizacao dessa vez
+      }
+    }
+
+    async function atualizarAgoraDashboard() {
+      if (!confirm("Atualizar agora esta máquina? O Spooler pode reiniciar durante o processo.")) return;
+      try {
+        const res = await fetch("/api/force-update", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + authToken }
+        });
+        const data = await res.json();
+        alert(data.message || "Atualização iniciada!");
+      } catch (e) {
+        alert("Erro ao iniciar atualização: " + e);
+      }
+    }
+
+    function showHomeView() {
+      document.getElementById("view-login").classList.add("hidden");
+      document.getElementById("view-dashboard").classList.add("hidden");
+      document.getElementById("view-home").classList.remove("hidden");
+
+      refreshHomeStatus();
+      checkUpdateVersionBadge("home");
+      loadMachineSpecsInto("home");
+      if (homeRefreshTimer) clearInterval(homeRefreshTimer);
+      homeRefreshTimer = setInterval(refreshHomeStatus, 5000);
+      if (homeUpdateCheckTimer) clearInterval(homeUpdateCheckTimer);
+      homeUpdateCheckTimer = setInterval(() => checkUpdateVersionBadge("home"), 5 * 60 * 1000);
+    }
+
+    function showLoginArea() {
+      if (homeRefreshTimer) clearInterval(homeRefreshTimer);
+      if (homeUpdateCheckTimer) clearInterval(homeUpdateCheckTimer);
+      document.getElementById("view-home").classList.add("hidden");
+      document.getElementById("view-login").classList.remove("hidden");
+    }
+
+    function showDashboard() {
+      if (homeRefreshTimer) clearInterval(homeRefreshTimer);
+      if (homeUpdateCheckTimer) clearInterval(homeUpdateCheckTimer);
+      document.getElementById("view-home").classList.add("hidden");
+      document.getElementById("view-login").classList.add("hidden");
+      document.getElementById("view-dashboard").classList.remove("hidden");
+      loadStats();
+      loadMachineSpecsInto("dash");
+      checkUpdateVersionBadge("dash");
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(() => {
+        loadStats();
+        if (currentTab === "frota") loadMachines();
+      }, 5000);
+    }
+
+    async function loadStats() {
+      if (!authToken) return;
+      try {
+        const res = await fetch("/api/status", {
+          headers: { "Authorization": "Bearer " + authToken }
+        });
+        if (res.status === 401) {
+          handleLogout();
+          return;
+        }
+        const d = await res.json();
+
+        // Cards
+        document.getElementById("val-auto").textContent = d.stats.restarts_auto || 0;
+        document.getElementById("val-manual").textContent = d.stats.restarts_manual || 0;
+        document.getElementById("val-cleaned").textContent = d.stats.total_prints_cleaned || 0;
+        document.getElementById("val-queue").textContent = d.current_queue || 0;
+
+        // Spooler status
+        const isRunning = d.spooler_status === "Running";
+        document.getElementById("dot-spooler").className = "dot " + (isRunning ? "" : "down");
+        document.getElementById("txt-spooler").textContent = isRunning ? "Spooler Ativo" : "Spooler Parado";
+
+        // History
+        renderHistory(d.history || []);
+      } catch (e) {
+        console.error("Erro ao carregar dados:", e);
+      }
+
+      // Card de identificação (foto/specs/detalhes) usa o /api/health público,
+      // que já tem hostname/impressoras/disco/último evento prontos.
+      const health = await fetchLocalHealth();
+      const dashDetails = document.getElementById("dash-details");
+      if (dashDetails) {
+        dashDetails.innerHTML = health ? buildMachineDetailsHtml(health, { skipQueueAndStats: true }) : "Não foi possível consultar o serviço local.";
+      }
+      if (health) {
+        updateMachineCardPhoto("dash", health);
+        const versionTxt = document.getElementById("dash-txt-version");
+        if (versionTxt && !versionTxt.dataset.updateAvailable) {
+          versionTxt.textContent = health.version ? `Versão: ${health.version}` : "Versão: -";
+        }
+      }
+    }
+
+    function renderHistory(hist) {
+      const tbody = document.getElementById("history-rows");
+      if (!hist || hist.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 28px;">Nenhum evento registrado até o momento.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = hist.map(item => `
+        <tr>
+          <td style="font-weight: 500;">${item.timestamp}</td>
+          <td>
+            <span class="pill ${item.type === 'Automático' ? 'pill-auto' : 'pill-manual'}">
+              ${item.type}
+            </span>
+          </td>
+          <td>${item.reason}</td>
+          <td style="color: var(--text-muted);">${item.printers || 'Todas'}</td>
+          <td style="font-weight: 700; color: var(--success);">${item.cleaned || 0}</td>
+          <td><span style="color: var(--success); font-weight: 600;">✓ Concluído</span></td>
+        </tr>
+      `).join("");
+    }
+
+    async function triggerForceRestart() {
+      if (!confirm("Deseja forçar o reinício do Spooler e a limpeza da fila agora?")) return;
+      const btn = document.getElementById("btn-force");
+      btn.disabled = true;
+      btn.textContent = "⏳ Executando limpeza...";
+
+      try {
+        const res = await fetch("/api/force-restart", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + authToken }
+        });
+        const d = await res.json();
+        alert(d.message || "Comando de reinício disparado com sucesso!");
+        loadStats();
+      } catch (e) {
+        alert("Erro ao disparar reinício forçado.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "⚡ Forçar Reinício e Limpeza Agora";
+      }
+    }
+
+    function openModalPassword() {
+      document.getElementById("modal-password").classList.remove("hidden");
+      document.getElementById("modal-pass-alert").style.display = "none";
+      document.getElementById("pw-current").value = "";
+      document.getElementById("pw-new").value = "";
+      document.getElementById("pw-confirm").value = "";
+    }
+
+    function closeModalPassword() {
+      document.getElementById("modal-password").classList.add("hidden");
+    }
+
+    async function submitChangePassword() {
+      const curr = document.getElementById("pw-current").value;
+      const next = document.getElementById("pw-new").value;
+      const conf = document.getElementById("pw-confirm").value;
+      const alertBox = document.getElementById("modal-pass-alert");
+
+      if (next !== conf) {
+        alertBox.className = "alert alert-danger";
+        alertBox.textContent = "A nova senha e a confirmação não coincidem!";
+        alertBox.style.display = "block";
+        return;
+      }
+
+      const currHash = await sha256(curr);
+      const newHash = await sha256(next);
+
+      try {
+        const res = await fetch("/api/change-password", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + authToken 
+          },
+          body: JSON.stringify({ current_hash: currHash, new_hash: newHash })
+        });
+        const d = await res.json();
+
+        if (d.success) {
+          alertBox.className = "alert alert-success";
+          alertBox.textContent = "Senha alterada com sucesso!";
+          alertBox.style.display = "block";
+          setTimeout(closeModalPassword, 1500);
+        } else {
+          alertBox.className = "alert alert-danger";
+          alertBox.textContent = d.message || "Senha atual incorreta.";
+          alertBox.style.display = "block";
+        }
+      } catch (e) {
+        alertBox.className = "alert alert-danger";
+        alertBox.textContent = "Erro ao comunicar com o servidor.";
+        alertBox.style.display = "block";
+      }
+    }
+
+    // ===================== FROTA DE MÁQUINAS =====================
+    let currentTab = "local";
+    let machinesCache = [];
+    let fleetPassHash = null; // hash da senha compartilhada, só em memória (nunca salva em disco)
+    let lastHealthCache = {}; // último /api/health que respondeu com sucesso por máquina (id -> health), pra não perder a info quando cair offline
+    const HEALTH_CACHE_STORAGE_KEY = "spooler_fleet_health_cache";
+
+    function loadHealthCacheFromStorage() {
+      try {
+        const raw = localStorage.getItem(HEALTH_CACHE_STORAGE_KEY);
+        if (raw) lastHealthCache = JSON.parse(raw);
+      } catch (e) {
+        // localStorage indisponível (modo privado, etc.) - segue só com o cache em memória.
+      }
+    }
+
+    function saveHealthCacheToStorage() {
+      try {
+        localStorage.setItem(HEALTH_CACHE_STORAGE_KEY, JSON.stringify(lastHealthCache));
+      } catch (e) {
+        // sem problema - só perde a persistência entre recarregamentos de página.
+      }
+    }
+
+    loadHealthCacheFromStorage();
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById("tab-local").classList.toggle("hidden", tab !== "local");
+      document.getElementById("tab-frota").classList.toggle("hidden", tab !== "frota");
+      document.getElementById("tabbtn-local").classList.toggle("active", tab === "local");
+      document.getElementById("tabbtn-frota").classList.toggle("active", tab === "frota");
+      if (tab === "frota") loadMachines();
+    }
+
+    async function loadMachines() {
+      if (!authToken) return;
+      try {
+        const res = await fetch("/api/machines", {
+          headers: { "Authorization": "Bearer " + authToken }
+        });
+        if (res.status === 401) { handleLogout(); return; }
+        const data = await res.json();
+        machinesCache = data.machines || [];
+        renderMachines();
+      } catch (e) {
+        console.error("Erro ao carregar maquinas:", e);
+      }
+    }
+
+    async function addMachine() {
+      const name = document.getElementById("machine-name").value.trim();
+      const host = document.getElementById("machine-host").value.trim();
+      if (!name || !host) return;
+      try {
+        await fetch("/api/machines/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + authToken },
+          body: JSON.stringify({ name, host })
+        });
+        document.getElementById("machine-name").value = "";
+        document.getElementById("machine-host").value = "";
+        loadMachines();
+      } catch (e) {
+        alert("Erro ao adicionar máquina: " + e);
+      }
+    }
+
+    async function removeMachine(id) {
+      if (!confirm("Remover esta máquina da frota? (isso não desinstala nada nela, só tira da lista)")) return;
+      try {
+        await fetch("/api/machines/remove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + authToken },
+          body: JSON.stringify({ id })
+        });
+        loadMachines();
+      } catch (e) {
+        alert("Erro ao remover máquina: " + e);
+      }
+    }
+
+    async function fetchMachineHealth(host) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      try {
+        const res = await fetch(`http://${host}:8989/api/health`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (e) {
+        clearTimeout(timeoutId);
+        return null;
+      }
+    }
+
+    function buildMachineDetailsHtml(health, opts) {
+      opts = opts || {};
+      const printers = (health.printers && health.printers.length) ? health.printers.join(", ") : "Nenhuma detectada";
+
+      let linhas = [];
+      linhas.push(`Computador: <strong>${health.hostname || "-"}</strong>${health.version ? ` <span style="color: var(--text-muted);">(v${health.version})</span>` : ""}`);
+      linhas.push(`Impressora(s): ${printers}`);
+
+      // Na tela inicial (publica) fila/estatisticas ja aparecem nos cards
+      // grandes acima, entao evita repetir a mesma informacao duas vezes.
+      if (!opts.skipQueueAndStats) {
+        linhas.push(`Fila atual: <strong>${health.current_queue}</strong> impressão(ões)`);
+      }
+
+      if (health.disk_free_gb != null && health.disk_total_gb) {
+        const pctLivre = (health.disk_free_gb / health.disk_total_gb) * 100;
+        const corDisco = pctLivre < 10 ? "var(--danger)" : (pctLivre < 20 ? "var(--warning)" : "inherit");
+        linhas.push(`Disco livre: <span style="color: ${corDisco};">${health.disk_free_gb} GB</span> de ${health.disk_total_gb} GB`);
+      }
+
+      if (!opts.skipQueueAndStats && health.stats) {
+        linhas.push(`Reinícios: ${health.stats.restarts_auto || 0} automáticos, ${health.stats.restarts_manual || 0} manuais · Limpos: ${health.stats.total_prints_cleaned || 0}`);
+      }
+
+      if (health.last_event) {
+        linhas.push(`Último evento: ${health.last_event.timestamp} — ${health.last_event.reason} <span style="color: var(--text-muted);">(${health.last_event.type})</span>`);
+      }
+
+      return linhas.join("<br>");
+    }
+
+    function renderMachines() {
+      const grid = document.getElementById("machines-grid");
+      if (machinesCache.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted);">Nenhuma máquina cadastrada ainda. Adicione uma acima.</p>`;
+        return;
+      }
+      if (grid.querySelector("p")) grid.innerHTML = "";
+
+      // Remove cards de máquinas que não existem mais na lista
+      const currentIds = new Set(machinesCache.map(m => String(m.id)));
+      grid.querySelectorAll(".machine-card").forEach(card => {
+        const id = card.id.replace("machine-", "");
+        if (!currentIds.has(id)) card.remove();
+      });
+
+      // Só cria o card de quem ainda não está na tela - os que já existem não
+      // são recriados a cada atualização, pra não "piscar"/perder o tamanho
+      // e as infos antigas enquanto o status novo é consultado.
+      machinesCache.forEach(m => {
+        if (document.getElementById(`machine-${m.id}`)) return;
+        const card = document.createElement("div");
+        card.className = "machine-card";
+        card.id = `machine-${m.id}`;
+
+        // Se já tiver um último status salvo (de antes de recarregar a página),
+        // o card já nasce preenchido com ele em vez de aparecer vazio até a
+        // primeira checagem responder.
+        const cached = lastHealthCache[m.id];
+        const detailsInicial = cached
+          ? buildMachineDetailsHtml(cached) + `<br><span style="color: var(--text-muted);">Última leitura: ${cached._checadoEm || "-"}</span>`
+          : "Consultando a máquina...";
+
+        card.innerHTML = `
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="flex: 0 0 auto; width: 72px; height: 60px; display: flex; align-items: center; justify-content: center;">
+              <img id="photo-${m.id}" alt="" style="max-width: 72px; max-height: 60px; display: none; border-radius: 10px;"
+                onload="this.style.display='block'; document.getElementById('photo-fallback-${m.id}').style.display='none';"
+                onerror="this.style.display='none';"
+                src="http://${m.host}:8989/photos/${encodeURIComponent(m.host)}.png">
+              <div id="photo-fallback-${m.id}" style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; font-size: 24px;">🖥️</div>
+            </div>
+            <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+              <div>
+                <div class="machine-name">${m.name}</div>
+                <div class="machine-host">${m.host}</div>
+              </div>
+              <div class="status-badge">
+                <div class="dot" id="dot-${m.id}"></div>
+                <span id="status-${m.id}">Verificando...</span>
+              </div>
+            </div>
+          </div>
+          <div class="machine-details" id="specs-${m.id}" style="margin-top: 10px;"></div>
+          <div class="machine-details" id="details-${m.id}" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border);">${detailsInicial}</div>
+          <div class="machine-actions">
+            <button class="btn btn-ghost btn-sm" onclick="window.open('http://${m.host}:8989/', '_blank')">Abrir Painel</button>
+            <span id="anydesk-btn-${m.id}"></span>
+            <button class="btn btn-action-force btn-sm" onclick="forceRestartRemote('${m.host}')">⚡ Forçar Reinício</button>
+            <button class="btn btn-ghost btn-sm" onclick="forceUpdateRemote('${m.host}')">⬇️ Forçar Atualização</button>
+            <button class="btn btn-ghost btn-sm" style="color: var(--danger);" onclick="removeMachine('${m.id}')">Remover</button>
+          </div>
+        `;
+        grid.appendChild(card);
+        loadMachineSpecsRemote(m.id, m.host);
+      });
+
+      refreshMachinesHealth();
+    }
+
+    async function fetchMachineSpecs(host) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      try {
+        const res = await fetch(`http://${host}:8989/api/machine-info`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (e) {
+        clearTimeout(timeoutId);
+        return null;
+      }
+    }
+
+    function buildSpecsHtml(s) {
+      if (!s) return "";
+      let linhas = [];
+      const modelo = [s.manufacturer, s.model].filter(Boolean).join(" ");
+      if (modelo) linhas.push(`Modelo: <strong>${modelo}</strong>`);
+      if (s.serial) linhas.push(`Número de série: ${s.serial}`);
+      if (s.os_caption) linhas.push(`SO: ${s.os_caption}`);
+      return linhas.join("<br>");
+    }
+
+    // Specs de hardware raramente mudam - busca so uma vez quando o card
+    // e criado, em vez de a cada ciclo de 5s como a saude/status.
+    async function loadMachineSpecsRemote(id, host) {
+      const specsEl = document.getElementById(`specs-${id}`);
+      if (!specsEl) return;
+      const s = await fetchMachineSpecs(host);
+      if (!document.getElementById(`specs-${id}`)) return; // card pode ter sido removido nesse meio tempo
+      specsEl.innerHTML = buildSpecsHtml(s);
+    }
+
+    function refreshMachinesHealth() {
+      machinesCache.forEach(async (m) => {
+        const dot = document.getElementById(`dot-${m.id}`);
+        const status = document.getElementById(`status-${m.id}`);
+        const details = document.getElementById(`details-${m.id}`);
+        if (!dot) return; // usuário pode ter trocado de aba/atualizado a lista nesse meio tempo
+
+        // Só o selinho pequeno indica que está checando - os detalhes (fila,
+        // impressoras, disco etc.) ficam como estavam até a resposta chegar.
+        // E só mostra "Verificando..." se a checagem realmente demorar - na
+        // rede local a maioria responde bem mais rápido que isso, então o
+        // selo nem chega a piscar na maioria dos ciclos.
+        const avisoDemoraTimer = setTimeout(() => { status.textContent = "Verificando..."; }, 600);
+
+        const health = await fetchMachineHealth(m.host);
+        clearTimeout(avisoDemoraTimer);
+        if (!document.getElementById(`dot-${m.id}`)) return; // card pode ter sumido enquanto aguardava a resposta
+
+        if (!health) {
+          dot.className = "dot down";
+          status.textContent = "Offline";
+          const cached = lastHealthCache[m.id];
+          if (cached) {
+            details.innerHTML = buildMachineDetailsHtml(cached) +
+              `<br><span style="color: var(--danger);">⚠ Offline agora - mostrando última informação conhecida (${cached._checadoEm}).</span>`;
+          } else {
+            details.textContent = "Não foi possível conectar. Verifique se a máquina está ligada e na mesma rede.";
+          }
+          return;
+        }
+
+        health._checadoEm = new Date().toLocaleTimeString("pt-BR");
+        lastHealthCache[m.id] = health;
+        saveHealthCacheToStorage();
+
+        const running = health.spooler_status === "Running";
+        dot.className = "dot " + (running ? "" : "down");
+        status.textContent = running ? "Spooler Ativo" : "Spooler Parado";
+        details.innerHTML = buildMachineDetailsHtml(health);
+
+        const anydeskSlot = document.getElementById(`anydesk-btn-${m.id}`);
+        if (anydeskSlot && health.anydesk_id) {
+          anydeskSlot.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="connectAnyDesk('${health.anydesk_id}')">🖥️ Acessar via AnyDesk</button>`;
+        }
+      });
+    }
+
+    async function getFleetPassHash() {
+      if (fleetPassHash) return fleetPassHash;
+      const pass = prompt("Digite a senha compartilhada da Frota para autorizar esta ação remota:");
+      if (!pass) return null;
+      fleetPassHash = await sha256(pass);
+      return fleetPassHash;
+    }
+
+    function connectAnyDesk(anydeskId) {
+      // Abre o AnyDesk direto naquele ID (via esquema anydesk:) - nao salva
+      // nada em favoritos, e evita acionar a deteccao de uso comercial da
+      // versao gratuita do AnyDesk que salvar varias maquinas costuma disparar.
+      window.location.href = "anydesk:" + anydeskId;
+    }
+
+    function connectRDP(host) {
+      // Gera um arquivo .rdp na hora (sem precisar de nada no servidor) e o
+      // navegador abre com o "Conexão de Área de Trabalho Remota" do Windows.
+      // Só funciona se a máquina de destino for Windows Pro/Enterprise (Home
+      // não aceita conexões RDP de entrada - limitação da própria Microsoft)
+      // e tiver o Acesso Remoto habilitado nela.
+      const rdpContent =
+        `full address:s:${host}\r\n` +
+        `prompt for credentials:i:1\r\n` +
+        `administrative session:i:1\r\n` +
+        `screen mode id:i:2\r\n`;
+      const blob = new Blob([rdpContent], { type: "application/rdp" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${host}.rdp`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    async function forceRestartRemote(host) {
+      if (!confirm(`Forçar reinício do Spooler na máquina "${host}"?`)) return;
+      const hash = await getFleetPassHash();
+      if (!hash) return;
+
+      try {
+        const loginRes = await fetch(`http://${host}:8989/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: "admin", password_hash: hash })
+        });
+        const loginData = await loginRes.json();
+        if (!loginData.success) {
+          alert("Falha na autenticação remota: " + (loginData.message || "senha incorreta para essa máquina."));
+          fleetPassHash = null; // pode ter digitado errado - pede de novo na próxima tentativa
+          return;
+        }
+
+        const res = await fetch(`http://${host}:8989/api/force-restart`, {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + loginData.token }
+        });
+        const data = await res.json();
+        alert(data.message || "Comando de reinício enviado!");
+        renderMachines();
+      } catch (e) {
+        alert("Erro ao comunicar com a máquina remota: " + e);
+      }
+    }
+
+    async function forceUpdateRemote(host) {
+      if (!confirm(`Forçar atualização do Gerenciador do Spooler na máquina "${host}"?\n\nEla vai baixar a versão mais recente e reinstalar sozinha - o Spooler pode reiniciar durante o processo.`)) return;
+      const hash = await getFleetPassHash();
+      if (!hash) return;
+
+      try {
+        const loginRes = await fetch(`http://${host}:8989/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: "admin", password_hash: hash })
+        });
+        const loginData = await loginRes.json();
+        if (!loginData.success) {
+          alert("Falha na autenticação remota: " + (loginData.message || "senha incorreta para essa máquina."));
+          fleetPassHash = null; // pode ter digitado errado - pede de novo na próxima tentativa
+          return;
+        }
+
+        const res = await fetch(`http://${host}:8989/api/force-update`, {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + loginData.token }
+        });
+        const data = await res.json();
+        alert(data.message || "Atualização iniciada!");
+      } catch (e) {
+        alert("Erro ao comunicar com a máquina remota: " + e);
+      }
+    }
+
+    // Auto-login se já tiver token - senão, mostra a tela inicial pública
+    // (status desta máquina, sem exigir login) em vez de já pedir senha.
+    window.addEventListener("DOMContentLoaded", () => {
+      if (authToken) {
+        showDashboard();
+      } else {
+        showHomeView();
+      }
+    });
+  </script>
+</body>
+</html>

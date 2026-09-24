@@ -1,0 +1,5 @@
+pytest>=8.0
+requests>=2.31
+Pillow>=10.0
+rembg[cpu,cli]>=2.0
+playwright>=1.40

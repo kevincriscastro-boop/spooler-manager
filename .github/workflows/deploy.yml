@@ -1,0 +1,107 @@
+name: Publicar na VPS
+
+# Builda dist_spooler.zip e publica na VPS toda vez que algo em dist_spooler/
+# muda na main - antes esse passo era manual (gerar o zip localmente e
+# rodar scp), dependendo do PC de quem estava trabalhando no projeto estar
+# ligado. Agora roda sozinho nos servidores do GitHub.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dist_spooler/**"
+  workflow_dispatch: {}
+
+# Enderecos do ambiente real vem dos secrets do repositorio (Settings >
+# Secrets and variables > Actions) - nada de IP/caminho no codigo.
+env:
+  VPS_HOST: ${{ secrets.VPS_HOST }}
+  VPS_USER: root
+  VPS_PATH: ${{ secrets.VPS_PATH }}
+  UPDATE_BASE_URL: ${{ secrets.UPDATE_BASE_URL }}
+  # Opcional: repositorio privado com dados do ambiente (fotos das maquinas),
+  # lido com uma deploy key somente leitura. Sem ele, o pacote sai sem fotos.
+  DADOS_REPO: ${{ vars.DADOS_REPO }}
+  TEM_DADOS: ${{ vars.DADOS_REPO != '' && secrets.DADOS_DEPLOY_KEY != '' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Conferir secrets
+        run: |
+          for v in VPS_HOST VPS_PATH UPDATE_BASE_URL; do
+            if [ -z "${!v}" ]; then echo "ERRO: secret $v nao configurado"; exit 1; fi
+          done
+
+      - name: Buscar dados privados (fotos)
+        if: env.TEM_DADOS == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.DADOS_REPO }}
+          ssh-key: ${{ secrets.DADOS_DEPLOY_KEY }}
+          path: _dados
+
+      - name: Juntar fotos ao pacote
+        if: env.TEM_DADOS == 'true'
+        run: |
+          mkdir -p dist_spooler/app/photos
+          cp _dados/photos/*.png dist_spooler/app/photos/
+          ls dist_spooler/app/photos | wc -l | xargs echo "fotos incluidas:"
+
+      # config.json fica fora do Git. Sem ele no zip, as maquinas atualizariam
+      # uma vez e depois nunca mais achariam o servidor - por isso o build
+      # para aqui se ele nao sair certo, antes de publicar qualquer coisa.
+      - name: Gerar config.json
+        run: |
+          python3 -c "import json, os; json.dump({'update_base_url': os.environ['UPDATE_BASE_URL']}, open('dist_spooler/app/config.json', 'w'))"
+
+      - name: Gerar dist_spooler.zip
+        run: |
+          cd dist_spooler
+          zip -r ../dist_spooler.zip . -x ".*"
+          cd ..
+          ls -la dist_spooler.zip
+          unzip -p dist_spooler.zip app/config.json | python3 -c "import json, sys; assert json.load(sys.stdin)['update_base_url']" \
+            || { echo "ERRO: app/config.json ausente ou invalido no zip"; exit 1; }
+
+      - name: Configurar chave SSH de deploy
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Publicar zip e VERSION na VPS
+        run: |
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            dist_spooler.zip "$VPS_USER@$VPS_HOST:$VPS_PATH/dist_spooler.zip"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            dist_spooler/VERSION "$VPS_USER@$VPS_HOST:$VPS_PATH/VERSION"
+
+      - name: Remover chave SSH temporaria
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
+
+      - name: Verificar publicacao
+        run: |
+          pip install --quiet requests
+          python3 - <<'PYEOF'
+          import os
+          import sys
+          import requests
+
+          version_local = open("dist_spooler/VERSION", encoding="utf-8").read().strip()
+          resp = requests.get(f"{os.environ['UPDATE_BASE_URL']}/VERSION", timeout=15)
+          resp.raise_for_status()
+          version_vps = resp.text.strip()
+
+          print(f"VERSION local: {version_local}")
+          print(f"VERSION na VPS: {version_vps}")
+          if version_vps != version_local:
+              print("ERRO: a VPS nao esta servindo a versao recem publicada.")
+              sys.exit(1)
+          print("OK - publicacao confirmada.")
+          PYEOF

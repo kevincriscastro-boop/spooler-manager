@@ -1,0 +1,35 @@
+# Artefatos gerados (zip de distribuicao) - nao precisam ser versionados,
+# sao recriados a partir do codigo-fonte quando necessario
+*.zip
+
+# Configuracao do ambiente real (endereco do servidor de atualizacao) - o
+# deploy gera a partir dos secrets do GitHub. Modelo: config.example.json
+dist_spooler/app/config.json
+
+# OBS: dist_spooler/app/data.json e mantido no repositorio de proposito -
+# e o MODELO padrao (senha admin/admin, config inicial) que o instalador usa
+# em instalacoes novas. As copias reais rodando em cada maquina (com senha
+# trocada, historico e frota cadastrada) ficam em C:\ProgramData\GerenciadorSpooler\
+# e nunca sao versionadas - so essa copia-modelo aqui no projeto.
+
+# Arquivos temporarios comuns do Windows/editores
+Thumbs.db
+desktop.ini
+*.tmp
+
+# Pasta de rascunho/trabalho temporario (nao faz parte do projeto)
+scratchpad/
+
+# Nota de continuidade entre sessoes do Claude Code - temporaria, apagar
+# depois de lida na sessao nova
+HANDOFF.md
+
+# Artefatos das ferramentas Python em tools/ (testes e script de fotos)
+tools/__pycache__/
+tools/**/__pycache__/
+.pytest_cache/
+*.pyc
+
+# Fotos por hostname identificam maquinas reais - ficam no repositorio de
+# dados privado (ver tools/fetch_machine_photo.py e o deploy.yml)
+dist_spooler/app/photos/

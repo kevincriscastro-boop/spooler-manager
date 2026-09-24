@@ -1,0 +1,8 @@
+# Configuracao do gitleaks (varredura de segredos): regras padrao + excecoes
+# conhecidas deste projeto.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Hash SHA-256 da senha padrao 'admin' do data.json modelo - publico de proposito (o instalador mostra admin/admin)"
+regexes = ['''8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918''']

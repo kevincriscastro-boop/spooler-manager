@@ -36,6 +36,15 @@ jobs:
             if [ -z "${!v}" ]; then echo "ERRO: secret $v nao configurado"; exit 1; fi
           done
 
+      # Nao publica nada se o codigo tiver IP/termo do ambiente real (mesma
+      # checagem do workflow "Checagem de dados sensiveis").
+      - name: Checar dados sensiveis
+        env:
+          SENSITIVE_PATTERNS: ${{ secrets.SENSITIVE_PATTERNS }}
+        run: |
+          printf '%s\n' "$SENSITIVE_PATTERNS" > "$RUNNER_TEMP/padroes.txt"
+          bash .github/scripts/checar-dados-sensiveis.sh "$RUNNER_TEMP/padroes.txt"
+
       - name: Buscar dados privados (fotos)
         if: env.TEM_DADOS == 'true'
         uses: actions/checkout@v4

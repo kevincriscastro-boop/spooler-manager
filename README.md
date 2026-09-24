@@ -119,8 +119,11 @@ python -m pytest tools/tests -m vps    # confere o pacote publicado no servidor
   `vps` são pulados automaticamente quando não há `config.json`.
 - [`tools/fetch_machine_photo.py`](tools/fetch_machine_photo.py) baixa a foto do
   modelo do equipamento, remove o fundo (rembg) e salva para exibir no painel.
-- O `.gitleaks.toml` configura a varredura de segredos:
-  `gitleaks git .` antes de publicar.
+- **Checagem de dados sensíveis:** ative uma vez por clone com
+  `git config core.hooksPath .githooks`. A partir daí, todo commit com um endereço
+  IP ou um termo da sua lista de proibidos (arquivo de padrões fora do repositório)
+  é recusado. A mesma checagem, junto com o [gitleaks](.gitleaks.toml), roda no
+  GitHub a cada push e antes de cada deploy (secret `SENSITIVE_PATTERNS`).
 
 ## Segurança
 

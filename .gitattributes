@@ -1,0 +1,4 @@
+# Scripts executados pelo bash (hook e workflows) precisam de LF - com CRLF
+# quebram com "command not found".
+*.sh text eol=lf
+.githooks/* text eol=lf

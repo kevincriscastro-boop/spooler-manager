@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Roda a checagem de dados sensiveis antes de cada commit. Ativar uma vez
+# por clone com:  git config core.hooksPath .githooks
+#
+# A lista de termos proibidos vem do repositorio de dados privado, quando ele
+# esta clonado ao lado deste (../GerenciadorSpooler-Dados).
+raiz=$(git rev-parse --show-toplevel)
+padroes="$raiz/../GerenciadorSpooler-Dados/checagem/padroes-sensiveis.txt"
+[ -f "$padroes" ] || padroes=""
+exec bash "$raiz/.github/scripts/checar-dados-sensiveis.sh" "$padroes"

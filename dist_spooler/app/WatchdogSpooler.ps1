@@ -48,6 +48,12 @@ try {
 
 # 2. Nos horarios fixos (11h e 15h), verifica e aplica atualizacao automatica
 #    direto, sem perguntar nada - nao depende de nenhuma tela/icone.
+#    Cada verificacao fica registrada em update.log (mesmo arquivo do
+#    AtualizarAgora.ps1) - antes, falha aqui era totalmente silenciosa.
+function Write-UpdateLog([string]$Mensagem) {
+    try { Add-Content -Path (Join-Path $AppDir "update.log") -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [vigia] $Mensagem" -Encoding UTF8 } catch {}
+}
+
 try {
     $now = Get-Date
     $hoje = $now.ToString("yyyy-MM-dd")
@@ -80,13 +86,22 @@ try {
         # vigia tenta de novo no proximo ciclo (nao perde o catch-up do dia).
         Set-Content -Path $lastCheckFile -Value $hoje -Encoding UTF8 -Force
 
+        $motivo = if ($isForcedWindow) { "janela das $($now.Hour)h" } else { "catch-up" }
         if ($remoteVersion -and $remoteVersion -ne $localVersion) {
+            Write-UpdateLog "$($motivo): versao nova $remoteVersion (instalada: $localVersion) - atualizando"
             $updaterScript = Join-Path $AppDir "AtualizarAgora.ps1"
             if (Test-Path $updaterScript) {
-                & $updaterScript -UpdateBaseUrl $updateBaseUrl
+                & $updaterScript -UpdateBaseUrl $updateBaseUrl -Origem "vigia"
+            } else {
+                Write-UpdateLog "ERRO: AtualizarAgora.ps1 nao encontrado"
             }
+        } else {
+            Write-UpdateLog "$($motivo): ja esta na versao mais recente ($localVersion)"
         }
+    } elseif (($isForcedWindow -or $isCatchUp) -and -not $updateBaseUrl) {
+        Write-UpdateLog "ERRO: config.json ausente ou sem update_base_url - nao da para verificar atualizacao"
     }
 } catch {
-    # Falha silenciosa (ex: VPS fora do ar) - tenta de novo no proximo ciclo.
+    # Tenta de novo no proximo ciclo (ex: VPS fora do ar) - mas fica registrado.
+    Write-UpdateLog "ERRO ao verificar atualizacao: $($_.Exception.Message)"
 }

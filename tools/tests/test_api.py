@@ -20,6 +20,7 @@ import io
 import json
 import os
 import pathlib
+import re
 import zipfile
 
 import pytest
@@ -178,12 +179,47 @@ def test_installer_copies_config_on_update():
     assert 'copy /y "app\\config.json"' in ramo_atualizacao
 
 
+def test_update_log_requires_token():
+    resp = requests.get(f"{LOCAL_BASE_URL}/api/update-log", timeout=TIMEOUT)
+    if resp.status_code == 404:
+        pytest.skip("monitor local ainda numa versao sem /api/update-log")
+    assert resp.status_code == 401
+
+
+def test_updater_does_not_wait_for_installer_children():
+    # Start-Process -Wait (PowerShell 5.1) espera tambem os processos filhos
+    # do instalador - o explorer.exe que ele abre para o icone da bandeja pode
+    # nunca terminar, e a atualizacao (e o vigia) ficavam presos para sempre.
+    atualizador = (REPO_ROOT / "dist_spooler" / "app" / "AtualizarAgora.ps1").read_text(encoding="utf-8-sig")
+    codigo = "\n".join(l for l in atualizador.splitlines() if not l.strip().startswith("#"))
+    assert not re.search(r"Start-Process[^\n]*-Wait\b", codigo)
+    assert "WaitForExit(" in codigo
+
+
 def test_installer_copies_model_photos_on_update():
     # A foto da maioria das maquinas vem da biblioteca por modelo - sem ela
     # na lista, maquinas ja instaladas nunca recebem fotos novas.
     bat = (REPO_ROOT / "dist_spooler" / "Instalar.bat").read_text(encoding="utf-8-sig")
     ramo_atualizacao = bat.split('if exist "%TARGET_DIR%\\data.json" (', 1)[1].split(") else (", 1)[0]
     assert '"app\\photos-by-model"' in ramo_atualizacao
+
+
+@pytest.mark.vps
+@requires_vps_url
+def test_published_bat_files_use_crlf():
+    # Com LF, o cmd se perde depois do "chcp 65001" e o Instalar.bat nao
+    # executa nenhum passo - nenhuma maquina atualiza, sem erro visivel.
+    resp = requests.get(f"{VPS_BASE_URL}/dist_spooler.zip", timeout=30)
+    with zipfile.ZipFile(io.BytesIO(resp.content)) as zf:
+        for nome in (n for n in zf.namelist() if n.lower().endswith(".bat")):
+            conteudo = zf.read(nome)
+            assert conteudo.count(b"\n") == conteudo.count(b"\r\n"), f"{nome} publicado com LF"
+
+
+def test_gitattributes_forces_crlf_on_bat():
+    # O zip e montado no GitHub (Linux): sem esta regra o Git entrega LF.
+    regras = (REPO_ROOT / ".gitattributes").read_text(encoding="utf-8")
+    assert re.search(r"(?m)^\*\.bat\s+text\s+eol=crlf", regras)
 
 
 @pytest.mark.vps

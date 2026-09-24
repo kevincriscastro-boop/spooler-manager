@@ -2,3 +2,10 @@
 # quebram com "command not found".
 *.sh text eol=lf
 .githooks/* text eol=lf
+
+# Scripts .bat/.cmd PRECISAM de CRLF: com LF, o cmd se perde na posicao do
+# arquivo depois do "chcp 65001" e nao executa nada do instalador. O zip e
+# montado no GitHub (Linux), onde o Git entregaria LF sem esta regra - foi
+# isso que impediu qualquer maquina de atualizar a partir de 24/09/2026 08:55.
+*.bat text eol=crlf
+*.cmd text eol=crlf

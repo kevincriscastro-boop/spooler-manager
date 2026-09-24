@@ -410,6 +410,25 @@ while ($listener.IsListening) {
                     Send-HttpResponse -Response $res -Content ($respObj | ConvertTo-Json) -ContentType "application/json" -StatusCode 200
                 }
             }
+            elseif ($path -eq "/api/update-log" -and $method -eq "GET") {
+                # Autenticado: historico das atualizacoes desta maquina (vigia e
+                # botao do painel) + saida da ultima execucao do instalador, pra
+                # diagnosticar pela Frota sem precisar acessar a maquina.
+                if (-not (Test-AuthToken $req)) {
+                    Send-HttpResponse -Response $res -Content '{"error":"Não autorizado"}' -ContentType "application/json" -StatusCode 401
+                    continue
+                }
+                $lerFim = {
+                    param($arquivo, $n)
+                    $p = Join-Path $AppDir $arquivo
+                    if (Test-Path $p) { @(Get-Content $p -Tail $n -ErrorAction SilentlyContinue) } else { @() }
+                }
+                $respObj = @{
+                    update_log     = & $lerFim "update.log" 100
+                    install_output = & $lerFim "install-output.log" 60
+                }
+                Send-HttpResponse -Response $res -Content ($respObj | ConvertTo-Json -Depth 3) -ContentType "application/json"
+            }
             elseif ($path -eq "/api/machines" -and $method -eq "GET") {
                 if (-not (Test-AuthToken $req)) {
                     Send-HttpResponse -Response $res -Content '{"error":"Não autorizado"}' -ContentType "application/json" -StatusCode 401
@@ -546,7 +565,7 @@ while ($listener.IsListening) {
 
                 try {
                     $updaterScript = Join-Path $AppDir "AtualizarAgora.ps1"
-                    $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$updaterScript`" -UpdateBaseUrl `"$updateBaseUrl`""
+                    $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$updaterScript`" -UpdateBaseUrl `"$updateBaseUrl`" -Origem painel"
                     Start-Process powershell.exe -ArgumentList $argList -WindowStyle Hidden
                     Send-HttpResponse -Response $res -Content '{"success":true,"message":"Atualização iniciada em segundo plano. O Spooler pode reiniciar durante o processo."}' -ContentType "application/json"
                 } catch {

@@ -77,6 +77,17 @@ jobs:
           ls -la dist_spooler.zip
           unzip -p dist_spooler.zip app/config.json | python3 -c "import json, sys; assert json.load(sys.stdin)['update_base_url']" \
             || { echo "ERRO: app/config.json ausente ou invalido no zip"; exit 1; }
+          # .bat com LF nao executa no Windows (o instalador para logo no
+          # comeco, sem erro visivel) - nunca publicar um pacote assim.
+          python3 - <<'PYEOF'
+          import sys, zipfile
+          ruins = [n for n in zipfile.ZipFile("dist_spooler.zip").namelist()
+                   if n.lower().endswith((".bat", ".cmd"))
+                   and (lambda b: b.count(b"\n") != b.count(b"\r\n"))(zipfile.ZipFile("dist_spooler.zip").read(n))]
+          if ruins:
+              print("ERRO: .bat sem quebra de linha CRLF no zip:", ruins); sys.exit(1)
+          print("OK - todos os .bat do zip com CRLF")
+          PYEOF
 
       - name: Configurar chave SSH de deploy
         run: |

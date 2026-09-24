@@ -20,6 +20,10 @@ e fica registrado.
 - **Frota de máquinas:** cadastre outros PCs pelo nome e veja todos num só lugar.
   Cada card mostra fila, impressoras, espaço em disco e modelo do equipamento, com
   reinício e atualização remotos e acesso rápido pelo AnyDesk.
+- **Foto do equipamento por modelo:** cada máquina identifica o próprio fabricante e
+  modelo e mostra a foto correspondente da biblioteca
+  [`photos-by-model/`](dist_spooler/app/photos-by-model). Uma foto serve para todas as
+  máquinas daquele modelo: 100 máquinas de 5 modelos precisam de 5 fotos.
 - **Tela pública sem login:** qualquer usuário vê o status da própria máquina. Toda
   ação que altera algo exige autenticação.
 - **Vigia (watchdog):** tarefa do sistema que roda a cada 5 minutos e religa o
@@ -117,8 +121,10 @@ python -m pytest tools/tests -m vps    # confere o pacote publicado no servidor
 
 - Os testes da API rodam contra a instância local já instalada. Os testes marcados
   `vps` são pulados automaticamente quando não há `config.json`.
-- [`tools/fetch_machine_photo.py`](tools/fetch_machine_photo.py) baixa a foto do
-  modelo do equipamento, remove o fundo (rembg) e salva para exibir no painel.
+- [`tools/fetch_machine_photo.py`](tools/fetch_machine_photo.py) adiciona um modelo
+  novo à biblioteca: baixa a foto do produto, remove o fundo (rembg) e recorta. Se o
+  seu modelo ainda não está lá, contribuições são bem-vindas: cada foto nova passa a
+  servir para todo mundo que tiver aquele equipamento.
 - **Checagem de dados sensíveis:** ative uma vez por clone com
   `git config core.hooksPath .githooks`. A partir daí, todo commit com um endereço
   IP ou um termo da sua lista de proibidos (arquivo de padrões fora do repositório)
@@ -137,6 +143,10 @@ python -m pytest tools/tests -m vps    # confere o pacote publicado no servidor
 ## Licença
 
 [MIT](LICENSE): pode usar, modificar e distribuir, mantendo o aviso de autoria.
+
+As fotos de equipamentos em `photos-by-model/` são imagens de produto dos respectivos
+fabricantes. Elas estão aqui só para identificar visualmente os equipamentos no
+painel, não fazem parte da licença MIT, e as marcas pertencem aos seus donos.
 
 ---
 

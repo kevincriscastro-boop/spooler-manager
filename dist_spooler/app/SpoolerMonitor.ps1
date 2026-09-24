@@ -149,6 +149,33 @@ function Get-MachineSpecs {
     return $global:cachedMachineSpecs
 }
 
+# Nome do arquivo da foto do modelo na biblioteca photos-by-model, ex:
+# "Dell Inc." + "Vostro 3401" -> "Dell_Vostro_3401". Precisa dar EXATAMENTE o
+# mesmo resultado do model_key() de tools/fetch_machine_photo.py, que e quem
+# salva as fotos - coberto por teste em tools/tests/test_fetch_machine_photo.py.
+function Get-ModelPhotoKey {
+    param([string]$Manufacturer, [string]$Model)
+    $fabricante = ([regex]::Replace($Manufacturer, '\b(Inc\.?|Corp\.?|Corporation|Ltd\.?|Co\.?|LLC)\b', '', 'IgnoreCase')).Trim(' ', '.')
+    $raw = "$($fabricante)_$($Model)".Trim('_')
+    return ([regex]::Replace($raw, '[^A-Za-z0-9._-]+', '_')).Trim('_')
+}
+
+# Qual arquivo servir para /photos/<nome>: a foto propria em app\photos, se
+# existir; senao, quando o pedido e a foto DESTA maquina, a foto do modelo
+# dela na biblioteca photos-by-model. Coberto por teste em
+# tools/tests/test_fetch_machine_photo.py.
+function Resolve-PhotoPath {
+    param([string]$FileName)
+    if (-not $FileName) { return $null }
+    $fotoPropria = Join-Path $AppDir "photos\$FileName"
+    if (Test-Path $fotoPropria) { return $fotoPropria }
+    if ([System.IO.Path]::GetFileNameWithoutExtension($FileName) -ne $env:COMPUTERNAME) { return $fotoPropria }
+    $specs = Get-MachineSpecs
+    if (-not ($specs -and $specs.manufacturer -and $specs.model)) { return $fotoPropria }
+    $chaveModelo = Get-ModelPhotoKey -Manufacturer $specs.manufacturer -Model $specs.model
+    return Join-Path $AppDir "photos-by-model\$chaveModelo.png"
+}
+
 function Send-HttpResponse {
     param(
         $Response,
@@ -332,11 +359,14 @@ while ($listener.IsListening) {
                 Send-HttpResponse -Response $res -Content ($specs | ConvertTo-Json) -ContentType "application/json"
             }
             elseif ($path -like "/photos/*" -and $method -eq "GET") {
-                # Serve a foto do equipamento (colocada em app\photos\<HOSTNAME>.png).
+                # Serve a foto do equipamento. A foto e por MODELO (biblioteca
+                # photos-by-model, uma foto serve pra todas as maquinas iguais);
+                # app\photos\<HOSTNAME>.png e so uma excecao opcional, pra quando
+                # uma maquina especifica precisa de foto propria.
                 # GetFileName descarta qualquer parte de diretorio do path (inclusive
                 # tentativas de "..") - so o nome do arquivo em si e usado.
                 $fileName = [System.IO.Path]::GetFileName($path)
-                $photoPath = if ($fileName) { Join-Path $AppDir "photos\$fileName" } else { $null }
+                $photoPath = Resolve-PhotoPath -FileName $fileName
                 if ($photoPath -and (Test-Path $photoPath) -and $fileName -notmatch '\.\.') {
                     try {
                         $bytes = [System.IO.File]::ReadAllBytes($photoPath)

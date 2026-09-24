@@ -58,6 +58,8 @@ if exist "%TARGET_DIR%\data.json" (
     copy /y "app\app-icon.ico" "%TARGET_DIR%\" >nul
     copy /y "app\app-icon-force.ico" "%TARGET_DIR%\" >nul
     if exist "app\photos" xcopy /e /i /y "app\photos" "%TARGET_DIR%\photos\" >nul
+    rem Biblioteca de fotos por modelo - e dela que sai a foto da maioria das maquinas.
+    if exist "app\photos-by-model" xcopy /e /i /y "app\photos-by-model" "%TARGET_DIR%\photos-by-model\" >nul
     copy /y "VERSION" "%TARGET_DIR%\" >nul
 ) else (
     xcopy /e /i /y "app\*" "%TARGET_DIR%\" >nul

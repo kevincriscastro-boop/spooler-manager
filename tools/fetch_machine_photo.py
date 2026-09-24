@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 """
-Prepara a foto de um equipamento para o Gerenciador do Spooler: baixa uma
-foto de produto, remove o fundo (rembg) e salva recortada/redimensionada
-nos dois lugares que o projeto usa:
+Prepara a foto de um MODELO de equipamento para o Gerenciador do Spooler:
+baixa uma foto de produto, remove o fundo (rembg) e salva recortada/
+redimensionada na biblioteca:
 
-  photos/<HOSTNAME>.png                           (servida pelo app; ver PHOTOS_DIR)
-  dist_spooler/app/photos-by-model/<Modelo>.png   (biblioteca reutilizável)
+  dist_spooler/app/photos-by-model/<Modelo>.png
 
-Se já existir uma foto processada pra esse modelo na biblioteca, só copia
-de lá - não baixa nem reprocessa nada. Isso é o normal quando duas
-máquinas da frota têm o mesmo modelo de computador.
+Uma foto por modelo serve para todas as maquinas daquele modelo - o
+monitor de cada maquina acha a sua pelo fabricante/modelo. 100 maquinas
+de 5 modelos = 5 fotos. Se o modelo ja estiver na biblioteca, nao ha nada
+a fazer.
 
 Uso:
-    python tools/fetch_machine_photo.py --hostname PC-EXEMPLO01 \\
-        --manufacturer Dell --model "Vostro 3401" \\
+    python tools/fetch_machine_photo.py --manufacturer Dell --model "Vostro 3401" \\
         --image-url "https://.../foto-do-produto.jpg"
 
-    # Se já tiver uma foto desse modelo na biblioteca, nem precisa do --image-url:
-    python tools/fetch_machine_photo.py --hostname OUTRO-PC \\
-        --manufacturer Dell --model "Vostro 3401"
+    # Excecao: foto propria de UMA maquina (ex: equipamento com visual
+    # diferente do modelo). Fica em photos/<HOSTNAME>.png e tem prioridade
+    # sobre a do modelo - ver PHOTOS_DIR.
+    python tools/fetch_machine_photo.py --manufacturer Dell --model "Vostro 3401" \\
+        --image-url "https://.../foto.jpg" --foto-propria PC-EXEMPLO01
 
 O manufacturer/model normalmente vem do próprio /api/machine-info da
 máquina (mesmos dados que já aparecem no painel). A URL da foto ainda
@@ -36,10 +37,10 @@ from PIL import Image
 from rembg import remove
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-# Fotos por hostname identificam maquinas reais, entao nao ficam neste repo:
-# se houver um repositorio de dados ao lado (GerenciadorSpooler-Dados), salva
-# la - o deploy junta essas fotos no pacote. Sem ele, salva na pasta do app
-# (ignorada pelo Git).
+# Fotos proprias (por hostname) identificam maquinas reais, entao nao ficam
+# neste repo: se houver um repositorio de dados ao lado
+# (GerenciadorSpooler-Dados), salva la - o deploy junta essas fotos no
+# pacote. Sem ele, salva na pasta do app (ignorada pelo Git).
 DADOS_PHOTOS_DIR = REPO_ROOT.parent / "GerenciadorSpooler-Dados" / "photos"
 PHOTOS_DIR = DADOS_PHOTOS_DIR if DADOS_PHOTOS_DIR.is_dir() else REPO_ROOT / "dist_spooler" / "app" / "photos"
 LIBRARY_DIR = REPO_ROOT / "dist_spooler" / "app" / "photos-by-model"
@@ -97,32 +98,27 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--hostname", required=True, help="Nome da máquina (COMPUTERNAME), ex: PC-EXEMPLO01")
-    parser.add_argument("--manufacturer", required=True, help="Fabricante, ex: Dell")
-    parser.add_argument("--model", required=True, help="Modelo comercial, ex: 'Vostro 3401'")
+    parser.add_argument("--manufacturer", required=True, help="Fabricante, como no painel. Ex: 'Dell Inc.'")
+    parser.add_argument("--model", required=True, help="Modelo, como no painel. Ex: 'Vostro 3401'")
+    parser.add_argument("--image-url", help="URL de uma foto de produto")
     parser.add_argument(
-        "--image-url",
-        help="URL de uma foto de produto (obrigatório se o modelo ainda não estiver na biblioteca)",
+        "--foto-propria", metavar="HOSTNAME",
+        help="Excecao: salva como foto propria desta maquina, em vez de foto do modelo",
     )
     args = parser.parse_args()
 
     key = model_key(args.manufacturer, args.model)
-    library_path = LIBRARY_DIR / f"{key}.png"
-    dest_path = PHOTOS_DIR / f"{args.hostname}.png"
-
-    if library_path.exists():
-        print(f"Modelo '{key}' já está na biblioteca - reaproveitando {library_path}")
-        dest_path.parent.mkdir(parents=True, exist_ok=True)
-        dest_path.write_bytes(library_path.read_bytes())
-        print(f"Salvo: {dest_path}")
-        return
+    if args.foto_propria:
+        dest_path = PHOTOS_DIR / f"{args.foto_propria}.png"
+    else:
+        dest_path = LIBRARY_DIR / f"{key}.png"
+        if dest_path.exists():
+            print(f"Modelo '{key}' já está na biblioteca ({dest_path}) - nada a fazer.")
+            print("Todas as máquinas desse modelo já exibem essa foto.")
+            return
 
     if not args.image_url:
-        print(
-            f"Modelo '{key}' ainda não está na biblioteca ({library_path}).\n"
-            "Passe --image-url com uma foto de produto para processar pela primeira vez.",
-            file=sys.stderr,
-        )
+        print(f"Passe --image-url com uma foto de produto para '{key}'.", file=sys.stderr)
         sys.exit(1)
 
     print(f"Baixando {args.image_url} ...")
@@ -130,7 +126,9 @@ def main():
     with urllib.request.urlopen(req, timeout=30) as resp:
         source_bytes = resp.read()
 
-    process_and_save(source_bytes, [dest_path, library_path])
+    process_and_save(source_bytes, [dest_path])
+    if not args.foto_propria:
+        print("Faça commit da foto nova: ela passa a valer para todas as máquinas desse modelo.")
 
 
 if __name__ == "__main__":

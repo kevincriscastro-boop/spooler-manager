@@ -178,6 +178,14 @@ def test_installer_copies_config_on_update():
     assert 'copy /y "app\\config.json"' in ramo_atualizacao
 
 
+def test_installer_copies_model_photos_on_update():
+    # A foto da maioria das maquinas vem da biblioteca por modelo - sem ela
+    # na lista, maquinas ja instaladas nunca recebem fotos novas.
+    bat = (REPO_ROOT / "dist_spooler" / "Instalar.bat").read_text(encoding="utf-8-sig")
+    ramo_atualizacao = bat.split('if exist "%TARGET_DIR%\\data.json" (', 1)[1].split(") else (", 1)[0]
+    assert '"app\\photos-by-model"' in ramo_atualizacao
+
+
 @pytest.mark.vps
 @requires_vps_url
 def test_vps_version_endpoint_is_reachable():

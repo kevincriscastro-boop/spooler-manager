@@ -53,12 +53,14 @@ jobs:
           ssh-key: ${{ secrets.DADOS_DEPLOY_KEY }}
           path: _dados
 
-      - name: Juntar fotos ao pacote
+      # Fotos proprias por hostname sao excecao (o normal e a foto do modelo,
+      # em photos-by-model/) - pode nao haver nenhuma.
+      - name: Juntar fotos proprias ao pacote
         if: env.TEM_DADOS == 'true'
         run: |
           mkdir -p dist_spooler/app/photos
-          cp _dados/photos/*.png dist_spooler/app/photos/
-          ls dist_spooler/app/photos | wc -l | xargs echo "fotos incluidas:"
+          find _dados/photos -maxdepth 1 -name '*.png' -exec cp {} dist_spooler/app/photos/ \; 2>/dev/null || true
+          ls dist_spooler/app/photos | wc -l | xargs echo "fotos proprias incluidas:"
 
       # config.json fica fora do Git. Sem ele no zip, as maquinas atualizariam
       # uma vez e depois nunca mais achariam o servidor - por isso o build

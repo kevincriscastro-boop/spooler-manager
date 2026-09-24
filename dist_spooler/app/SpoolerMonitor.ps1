@@ -430,7 +430,10 @@ while ($listener.IsListening) {
                 $lerFim = {
                     param($arquivo, $n)
                     $p = Join-Path $AppDir $arquivo
-                    if (Test-Path $p) { @(Get-Content $p -Tail $n -ErrorAction SilentlyContinue) } else { @() }
+                    # [string] tira as propriedades extras (PSPath, PSDrive...) que o
+                    # Get-Content anexa a cada linha - senao o ConvertTo-Json do
+                    # PowerShell 5.1 serializa cada linha como um objeto enorme.
+                    if (Test-Path $p) { @(Get-Content $p -Tail $n -ErrorAction SilentlyContinue | ForEach-Object { [string]$_ }) } else { @() }
                 }
                 $respObj = @{
                     update_log     = & $lerFim "update.log" 100

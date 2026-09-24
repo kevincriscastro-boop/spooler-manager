@@ -186,6 +186,23 @@ def test_update_log_requires_token():
     assert resp.status_code == 401
 
 
+def test_update_log_returns_plain_lines():
+    # Com a senha padrao de fabrica (quem trocou a senha pula este teste).
+    login = requests.post(f"{LOCAL_BASE_URL}/api/login", timeout=TIMEOUT, json={
+        "username": "admin",
+        "password_hash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    })
+    if login.status_code != 200:
+        pytest.skip("monitor local nao usa a senha padrao")
+    resp = requests.get(f"{LOCAL_BASE_URL}/api/update-log", timeout=TIMEOUT,
+                        headers={"Authorization": "Bearer " + login.json()["token"]})
+    if resp.status_code == 404:
+        pytest.skip("monitor local ainda numa versao sem /api/update-log")
+    dados = resp.json()
+    for campo in ("update_log", "install_output"):
+        assert all(isinstance(linha, str) for linha in dados[campo] or []), f"{campo} com linhas que nao sao texto"
+
+
 def test_updater_does_not_wait_for_installer_children():
     # Start-Process -Wait (PowerShell 5.1) espera tambem os processos filhos
     # do instalador - o explorer.exe que ele abre para o icone da bandeja pode

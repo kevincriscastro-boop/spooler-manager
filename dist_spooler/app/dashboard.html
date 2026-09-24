@@ -1264,27 +1264,34 @@
     let currentTab = "local";
     let machinesCache = [];
     let fleetPassHash = null; // hash da senha compartilhada, só em memória (nunca salva em disco)
-    let lastHealthCache = {}; // último /api/health que respondeu com sucesso por máquina (id -> health), pra não perder a info quando cair offline
+    // Última leitura que respondeu com sucesso por máquina (id -> dados), pra não
+    // perder a info quando ela cai offline e a página é recarregada: o status
+    // (/api/health) e as especificações de hardware/SO (/api/machine-info).
     const HEALTH_CACHE_STORAGE_KEY = "spooler_fleet_health_cache";
+    const SPECS_CACHE_STORAGE_KEY = "spooler_fleet_specs_cache";
 
-    function loadHealthCacheFromStorage() {
+    function loadCacheFromStorage(key) {
       try {
-        const raw = localStorage.getItem(HEALTH_CACHE_STORAGE_KEY);
-        if (raw) lastHealthCache = JSON.parse(raw);
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : {};
       } catch (e) {
         // localStorage indisponível (modo privado, etc.) - segue só com o cache em memória.
+        return {};
       }
     }
 
-    function saveHealthCacheToStorage() {
+    function saveCacheToStorage(key, cache) {
       try {
-        localStorage.setItem(HEALTH_CACHE_STORAGE_KEY, JSON.stringify(lastHealthCache));
+        localStorage.setItem(key, JSON.stringify(cache));
       } catch (e) {
         // sem problema - só perde a persistência entre recarregamentos de página.
       }
     }
 
-    loadHealthCacheFromStorage();
+    let lastHealthCache = loadCacheFromStorage(HEALTH_CACHE_STORAGE_KEY);
+    let lastSpecsCache = loadCacheFromStorage(SPECS_CACHE_STORAGE_KEY);
+    function saveHealthCacheToStorage() { saveCacheToStorage(HEALTH_CACHE_STORAGE_KEY, lastHealthCache); }
+    function saveSpecsCacheToStorage() { saveCacheToStorage(SPECS_CACHE_STORAGE_KEY, lastSpecsCache); }
 
     function switchTab(tab) {
       currentTab = tab;
@@ -1336,6 +1343,8 @@
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + authToken },
           body: JSON.stringify({ id })
         });
+        delete lastHealthCache[id]; saveHealthCacheToStorage();
+        delete lastSpecsCache[id]; saveSpecsCacheToStorage();
         loadMachines();
       } catch (e) {
         alert("Erro ao remover máquina: " + e);
@@ -1424,7 +1433,7 @@
             <div style="flex: 0 0 auto; width: 72px; height: 60px; display: flex; align-items: center; justify-content: center;">
               <img id="photo-${m.id}" alt="" style="max-width: 72px; max-height: 60px; display: none; border-radius: 10px;"
                 onload="this.style.display='block'; document.getElementById('photo-fallback-${m.id}').style.display='none';"
-                onerror="this.style.display='none';"
+                onerror="usarFotoDoModeloGuardado(this, '${m.id}');"
                 src="http://${m.host}:8989/photos/${encodeURIComponent(m.host)}.png">
               <div id="photo-fallback-${m.id}" style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; font-size: 24px;">🖥️</div>
             </div>
@@ -1439,7 +1448,7 @@
               </div>
             </div>
           </div>
-          <div class="machine-details" id="specs-${m.id}" style="margin-top: 10px;"></div>
+          <div class="machine-details" id="specs-${m.id}" style="margin-top: 10px;">${buildSpecsHtml(lastSpecsCache[m.id])}</div>
           <div class="machine-details" id="details-${m.id}" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border);">${detailsInicial}</div>
           <div class="machine-actions">
             <button class="btn btn-ghost btn-sm" onclick="window.open('http://${m.host}:8989/', '_blank')">Abrir Painel</button>
@@ -1481,13 +1490,32 @@
     }
 
     // Specs de hardware raramente mudam - busca so uma vez quando o card
-    // e criado, em vez de a cada ciclo de 5s como a saude/status.
+    // e criado, em vez de a cada ciclo de 5s como a saude/status. A ultima
+    // leitura fica guardada: com a maquina offline, o card continua mostrando
+    // modelo/serie/SO em vez de ficar em branco.
     async function loadMachineSpecsRemote(id, host) {
       const specsEl = document.getElementById(`specs-${id}`);
       if (!specsEl) return;
       const s = await fetchMachineSpecs(host);
       if (!document.getElementById(`specs-${id}`)) return; // card pode ter sido removido nesse meio tempo
-      specsEl.innerHTML = buildSpecsHtml(s);
+      if (s) {
+        lastSpecsCache[id] = s;
+        saveSpecsCacheToStorage();
+      }
+      specsEl.innerHTML = buildSpecsHtml(s || lastSpecsCache[id]);
+    }
+
+    // A maquina nao respondeu a foto (offline, ou versao antiga sem foto por
+    // modelo): pede a foto do modelo ao monitor LOCAL, a partir do fabricante/
+    // modelo guardados da ultima leitura. Sem isso, o card fica com o icone.
+    function usarFotoDoModeloGuardado(img, id) {
+      const s = lastSpecsCache[id];
+      if (!img.dataset.tentouModelo && s && s.manufacturer && s.model) {
+        img.dataset.tentouModelo = "1";
+        img.src = `/api/model-photo?manufacturer=${encodeURIComponent(s.manufacturer)}&model=${encodeURIComponent(s.model)}`;
+        return;
+      }
+      img.style.display = "none";
     }
 
     function refreshMachinesHealth() {
@@ -1521,9 +1549,13 @@
           return;
         }
 
-        health._checadoEm = new Date().toLocaleTimeString("pt-BR");
+        health._checadoEm = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
         lastHealthCache[m.id] = health;
         saveHealthCacheToStorage();
+
+        // Estava offline quando o card foi criado e ainda nao temos as specs:
+        // busca agora que ela respondeu, sem precisar recarregar a pagina.
+        if (!lastSpecsCache[m.id]) loadMachineSpecsRemote(m.id, m.host);
 
         const running = health.spooler_status === "Running";
         dot.className = "dot " + (running ? "" : "down");

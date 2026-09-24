@@ -13,6 +13,7 @@ Uso:
 import json
 import pathlib
 import re
+from urllib.parse import parse_qs, urlparse
 
 from playwright.sync_api import sync_playwright
 
@@ -105,6 +106,13 @@ def responder(route):
             return route.fulfill(status=404, body="")
         return route.fulfill(content_type="image/png", body=(APP_DIR / "photos-by-model" / foto).read_bytes(),
                              headers={"Access-Control-Allow-Origin": "*"})
+    if path == "/api/model-photo":
+        q = parse_qs(urlparse(url).query)
+        chave = f"{q.get('manufacturer', [''])[0]}_{q.get('model', [''])[0]}".replace(" ", "_").replace("Inc._", "")
+        arquivo = APP_DIR / "photos-by-model" / f"{chave}.png"
+        if not arquivo.exists():
+            return route.fulfill(status=404, body="")
+        return route.fulfill(content_type="image/png", body=arquivo.read_bytes())
     if path == "/api/health":
         return json_resp(health(host))
     if path == "/api/machine-info":

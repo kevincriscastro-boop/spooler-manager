@@ -358,15 +358,24 @@ while ($listener.IsListening) {
                 $specs = Get-MachineSpecs
                 Send-HttpResponse -Response $res -Content ($specs | ConvertTo-Json) -ContentType "application/json"
             }
-            elseif ($path -like "/photos/*" -and $method -eq "GET") {
+            elseif (($path -like "/photos/*" -or $path -eq "/api/model-photo") -and $method -eq "GET") {
                 # Serve a foto do equipamento. A foto e por MODELO (biblioteca
                 # photos-by-model, uma foto serve pra todas as maquinas iguais);
                 # app\photos\<HOSTNAME>.png e so uma excecao opcional, pra quando
                 # uma maquina especifica precisa de foto propria.
                 # GetFileName descarta qualquer parte de diretorio do path (inclusive
                 # tentativas de "..") - so o nome do arquivo em si e usado.
-                $fileName = [System.IO.Path]::GetFileName($path)
-                $photoPath = Resolve-PhotoPath -FileName $fileName
+                if ($path -eq "/api/model-photo") {
+                    # Foto de um modelo qualquer da biblioteca - usada pela Frota
+                    # para continuar mostrando a foto de uma maquina offline, a
+                    # partir do fabricante/modelo guardados da ultima leitura.
+                    $chaveModelo = Get-ModelPhotoKey -Manufacturer $req.QueryString["manufacturer"] -Model $req.QueryString["model"]
+                    $fileName = "$chaveModelo.png"
+                    $photoPath = if ($chaveModelo) { Join-Path $AppDir "photos-by-model\$fileName" } else { $null }
+                } else {
+                    $fileName = [System.IO.Path]::GetFileName($path)
+                    $photoPath = Resolve-PhotoPath -FileName $fileName
+                }
                 if ($photoPath -and (Test-Path $photoPath) -and $fileName -notmatch '\.\.') {
                     try {
                         $bytes = [System.IO.File]::ReadAllBytes($photoPath)

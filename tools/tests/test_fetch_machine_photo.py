@@ -67,6 +67,36 @@ def _funcao_do_monitor(nome):
 
 
 @pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
+def test_fila_snapshot_nao_trava_com_spooler_preso():
+    # Get-Printer/Get-PrintJob simulados: primeiro respondem normal; depois o
+    # "spooler trava" (a consulta nunca termina). O monitor precisa desistir
+    # dentro do limite e devolver a ultima leitura boa, marcada ok=False.
+    script = "\n".join([
+        _funcao_do_monitor("Get-FilaSnapshot"),
+        "$global:filaSnapshot = $null; $global:travado = $false",
+        "function Get-Printer { param([switch]$AsJob, $ErrorAction)"
+        "  if ($global:travado) { Start-Job { Start-Sleep 60 } } else { Start-Job { [PSCustomObject]@{ Name = 'Impressora A' } } } }",
+        "function Get-PrintJob { param($PrinterName, [switch]$AsJob, $ErrorAction)"
+        "  Start-Job { [PSCustomObject]@{ DocumentName = 'doc.pdf' }; [PSCustomObject]@{ DocumentName = 'b.pdf' } } }",
+        "$a = Get-FilaSnapshot",
+        "'normal: ok=' + $a.ok + ' impressoras=' + $a.impressoras.Count + ' trabalhos=' + $a.impressoras[0].Jobs.Count",
+        "$b = Get-FilaSnapshot",
+        "'cache: mesmo objeto=' + [object]::ReferenceEquals($a, $b)",
+        "$global:travado = $true",
+        "$t = [Diagnostics.Stopwatch]::StartNew(); $c = Get-FilaSnapshot -Forcar",
+        "'travado: ok=' + $c.ok + ' impressoras=' + $c.impressoras.Count + ' em_ate_12s=' + ($t.Elapsed.TotalSeconds -lt 12)",
+    ])
+    saida = subprocess.run(["powershell", "-NoProfile", "-Command", script],
+                           capture_output=True, text=True, check=True, timeout=90).stdout.splitlines()
+    saida = [linha for linha in saida if not linha.startswith("[AVISO]")]
+    assert saida == [
+        "normal: ok=True impressoras=1 trabalhos=2",
+        "cache: mesmo objeto=True",
+        "travado: ok=False impressoras=1 em_ate_12s=True",
+    ]
+
+
+@pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
 def test_powershell_resolve_photo_path(tmp_path):
     # Monta um AppDir falso: biblioteca com a foto do modelo, uma maquina com
     # foto propria, e roda a funcao do monitor com Get-MachineSpecs simulado.

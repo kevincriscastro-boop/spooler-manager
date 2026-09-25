@@ -111,16 +111,16 @@ function Get-MachineSpecs {
     }
     $global:machineSpecsCheckedAt = Get-Date
     try {
-        $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction Stop
-        $bios = Get-CimInstance Win32_BIOS -ErrorAction SilentlyContinue
-        $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
+        $cs = Get-CimInstance Win32_ComputerSystem -OperationTimeoutSec 5 -ErrorAction Stop
+        $bios = Get-CimInstance Win32_BIOS -OperationTimeoutSec 5 -ErrorAction SilentlyContinue
+        $os = Get-CimInstance Win32_OperatingSystem -OperationTimeoutSec 5 -ErrorAction SilentlyContinue
 
         # Win32_ComputerSystem.Model costuma trazer so o codigo interno (ex:
         # "83NS" na Lenovo). O nome comercial (ex: "IdeaPad Slim 3 15IRH10")
         # geralmente fica em Win32_ComputerSystemProduct.Version - mas em
         # placas genericas esse campo vem com texto de preenchimento do
         # fabricante da placa-mae, entao so usa se parecer um valor real.
-        $csProduct = Get-CimInstance Win32_ComputerSystemProduct -ErrorAction SilentlyContinue
+        $csProduct = Get-CimInstance Win32_ComputerSystemProduct -OperationTimeoutSec 5 -ErrorAction SilentlyContinue
         $modelComercial = if ($csProduct.Version) { $csProduct.Version.Trim() } else { $null }
 
         # Alem das frases de preenchimento conhecidas, tambem descarta valores
@@ -147,6 +147,58 @@ function Get-MachineSpecs {
         $global:cachedMachineSpecs = $null
     }
     return $global:cachedMachineSpecs
+}
+
+# Leitura das impressoras e da fila de impressao, COM TEMPO LIMITE.
+# Get-Printer/Get-PrintJob podem ficar presos para sempre quando o spooler
+# trava - justamente o cenario que este app existe para resolver. Como o
+# monitor atende um pedido por vez, uma consulta presa congelava o painel e a
+# API inteiros (vigia so via "sem resposta"). Rodando como job com limite, o
+# pior caso e devolver a ultima leitura boa, marcada como desatualizada.
+# O resultado fica guardado por 10 s: o /api/health e consultado a cada 5 s
+# por cada painel aberto na Frota, e a leitura via job custa ~1 s.
+$global:filaSnapshot = $null
+function Get-FilaSnapshot {
+    param([switch]$Forcar)
+    $agora = Get-Date
+    if (-not $Forcar -and $global:filaSnapshot -and ($agora - $global:filaSnapshot.lido_em).TotalSeconds -lt 10) {
+        return $global:filaSnapshot
+    }
+
+    $prazoFinal = $agora.AddSeconds(10)
+    $impressoras = $null
+    $jobImpressoras = Get-Printer -AsJob -ErrorAction SilentlyContinue
+    if ($jobImpressoras -and (Wait-Job $jobImpressoras -Timeout 8)) {
+        $impressoras = @(Receive-Job $jobImpressoras -ErrorAction SilentlyContinue)
+    }
+    if ($jobImpressoras) { Remove-Job $jobImpressoras -Force -ErrorAction SilentlyContinue }
+
+    if ($null -eq $impressoras) {
+        Write-Host "[AVISO] Spooler nao respondeu a consulta de impressoras em 8 s" -ForegroundColor Yellow
+        $anterior = $global:filaSnapshot
+        $global:filaSnapshot = [PSCustomObject]@{
+            lido_em = $agora; ok = $false
+            # @() evita que uma lista de 1 impressora vire item solto (sem .Count no PS 5.1)
+            impressoras = @(if ($anterior) { $anterior.impressoras })
+        }
+        return $global:filaSnapshot
+    }
+
+    $ok = $true
+    $lista = foreach ($p in $impressoras) {
+        $trabalhos = @()
+        $restante = [int][Math]::Max(1, ($prazoFinal - (Get-Date)).TotalSeconds)
+        $jobFila = Get-PrintJob -PrinterName $p.Name -AsJob -ErrorAction SilentlyContinue
+        if ($jobFila -and (Wait-Job $jobFila -Timeout $restante)) {
+            $trabalhos = @(Receive-Job $jobFila -ErrorAction SilentlyContinue)
+        } else {
+            $ok = $false
+        }
+        if ($jobFila) { Remove-Job $jobFila -Force -ErrorAction SilentlyContinue }
+        [PSCustomObject]@{ Name = $p.Name; Jobs = $trabalhos }
+    }
+    $global:filaSnapshot = [PSCustomObject]@{ lido_em = $agora; ok = $ok; impressoras = @($lista) }
+    return $global:filaSnapshot
 }
 
 # Nome do arquivo da foto do modelo na biblioteca photos-by-model, ex:
@@ -237,10 +289,9 @@ function Test-FilaTravada {
 
     $stuckJobs = @()
     try {
-        $printers = Get-Printer -ErrorAction SilentlyContinue
-        foreach ($p in $printers) {
-            $jobs = Get-PrintJob -PrinterName $p.Name -ErrorAction SilentlyContinue
-            foreach ($j in $jobs) {
+        # Leitura nova (sem o cache de 10 s) - mas com tempo limite, ver Get-FilaSnapshot.
+        foreach ($p in (Get-FilaSnapshot -Forcar).impressoras) {
+            foreach ($j in $p.Jobs) {
                 if ($j.SubmittedTime) {
                     $tempoFila = (Get-Date) - $j.SubmittedTime
                     if ($tempoFila.TotalMinutes -ge $thresholdMinutes) {
@@ -310,16 +361,10 @@ while ($listener.IsListening) {
                 # usado pelo ícone da bandeja (TrayHelper.ps1) e pelo Painel de Frota
                 # (visão remota de várias máquinas) para exibir o status.
                 $spoolerStatus = (Get-Service -Name Spooler -ErrorAction SilentlyContinue).Status
-                $queueCount = 0
-                $printerNames = @()
-                try {
-                    $printers = Get-Printer -ErrorAction SilentlyContinue
-                    foreach ($p in $printers) {
-                        $printerNames += $p.Name
-                        $jobs = Get-PrintJob -PrinterName $p.Name -ErrorAction SilentlyContinue
-                        if ($jobs) { $queueCount += $jobs.Count }
-                    }
-                } catch {}
+                $fila = Get-FilaSnapshot
+                $printerNames = @($fila.impressoras | ForEach-Object { $_.Name })
+                $queueCount = ($fila.impressoras | ForEach-Object { $_.Jobs.Count } | Measure-Object -Sum).Sum
+                if (-not $queueCount) { $queueCount = 0 }
 
                 $installedVersion = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw -ErrorAction SilentlyContinue).Trim() } else { "" }
 
@@ -330,7 +375,7 @@ while ($listener.IsListening) {
                 $diskFreeGb = $null
                 $diskTotalGb = $null
                 try {
-                    $disco = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'" -ErrorAction Stop
+                    $disco = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'" -OperationTimeoutSec 5 -ErrorAction Stop
                     if ($disco) {
                         $diskFreeGb = [Math]::Round($disco.FreeSpace / 1GB, 1)
                         $diskTotalGb = [Math]::Round($disco.Size / 1GB, 1)
@@ -348,6 +393,8 @@ while ($listener.IsListening) {
                     last_event = $lastEvent
                     disk_free_gb = $diskFreeGb
                     disk_total_gb = $diskTotalGb
+                    # false = o spooler nao respondeu a tempo; impressoras/fila sao da ultima leitura boa
+                    fila_disponivel = [bool]$fila.ok
                 }
                 Send-HttpResponse -Response $res -Content ($respObj | ConvertTo-Json -Depth 5) -ContentType "application/json"
             }
@@ -517,14 +564,8 @@ while ($listener.IsListening) {
                 $d = Get-JsonData
                 $spoolerStatus = (Get-Service -Name Spooler -ErrorAction SilentlyContinue).Status
 
-                $queueCount = 0
-                try {
-                    $printers = Get-Printer -ErrorAction SilentlyContinue
-                    foreach ($p in $printers) {
-                        $jobs = Get-PrintJob -PrinterName $p.Name -ErrorAction SilentlyContinue
-                        if ($jobs) { $queueCount += $jobs.Count }
-                    }
-                } catch {}
+                $queueCount = ((Get-FilaSnapshot).impressoras | ForEach-Object { $_.Jobs.Count } | Measure-Object -Sum).Sum
+                if (-not $queueCount) { $queueCount = 0 }
 
                 $respObj = @{
                     spooler_status = if ($spoolerStatus) { $spoolerStatus.ToString() } else { "Unknown" }

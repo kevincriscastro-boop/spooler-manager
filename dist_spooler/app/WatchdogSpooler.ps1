@@ -39,20 +39,41 @@ try {
     $updateBaseUrl = (Get-Content (Join-Path $AppDir "config.json") -Raw -ErrorAction Stop | ConvertFrom-Json).update_base_url
 } catch {}
 
-# 1. Religa o monitor se nao estiver respondendo
+# Registro das acoes do vigia em update.log (mesmo arquivo do AtualizarAgora.ps1)
+# - antes, falhas aqui eram totalmente silenciosas.
+function Write-UpdateLog([string]$Mensagem) {
+    try { Add-Content -Path (Join-Path $AppDir "update.log") -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [vigia] $Mensagem" -Encoding UTF8 } catch {}
+}
+
+# 1. Religa o monitor se nao estiver respondendo.
+#    "schtasks /run" so resolve se o monitor CAIU: se o processo esta vivo mas
+#    TRAVADO (ex: preso numa consulta ao spooler), o Agendador acha que a
+#    tarefa ja esta rodando e nao faz nada. Por isso, na 2a falha seguida
+#    (~10 min sem resposta), encerra o processo travado antes de religar.
+#    Uma falha isolada nao derruba nada (pode ser so um momento de lentidao).
+$falhasFile = Join-Path $AppDir "MonitorFalhas.txt"
 try {
-    Invoke-RestMethod -Uri "http://127.0.0.1:8989/api/health" -TimeoutSec 3 -ErrorAction Stop | Out-Null
+    Invoke-RestMethod -Uri "http://127.0.0.1:8989/api/health" -TimeoutSec 15 -ErrorAction Stop | Out-Null
+    if (Test-Path $falhasFile) { Remove-Item $falhasFile -Force -ErrorAction SilentlyContinue }
 } catch {
+    $falhas = 1
+    try { $falhas = [int](Get-Content $falhasFile -Raw -ErrorAction Stop) + 1 } catch {}
+    Set-Content -Path $falhasFile -Value $falhas -Force -ErrorAction SilentlyContinue
+
+    if ($falhas -ge 2) {
+        $travados = @(Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { $_.CommandLine -like '*SpoolerMonitor.ps1*' })
+        Write-UpdateLog "Monitor sem responder ha $falhas verificacoes - encerrando $($travados.Count) processo(s) travado(s) e religando"
+        schtasks /end /tn "GerenciadorSpoolerMonitor" | Out-Null
+        $travados | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+        Start-Sleep -Seconds 2
+        Remove-Item $falhasFile -Force -ErrorAction SilentlyContinue
+    }
     schtasks /run /tn "GerenciadorSpoolerMonitor" | Out-Null
 }
 
 # 2. Nos horarios fixos (11h e 15h), verifica e aplica atualizacao automatica
 #    direto, sem perguntar nada - nao depende de nenhuma tela/icone.
-#    Cada verificacao fica registrada em update.log (mesmo arquivo do
-#    AtualizarAgora.ps1) - antes, falha aqui era totalmente silenciosa.
-function Write-UpdateLog([string]$Mensagem) {
-    try { Add-Content -Path (Join-Path $AppDir "update.log") -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [vigia] $Mensagem" -Encoding UTF8 } catch {}
-}
 
 try {
     $now = Get-Date

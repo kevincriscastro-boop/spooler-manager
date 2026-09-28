@@ -245,3 +245,42 @@ def test_vps_version_endpoint_is_reachable():
     resp = requests.get(f"{VPS_BASE_URL}/VERSION", timeout=TIMEOUT)
     assert resp.status_code == 200
     assert resp.text.strip(), "VERSION publicado na VPS veio vazio"
+
+
+# --------------------------------------------------------------------------
+# Configuracoes do monitor e edicao/ultima leitura das maquinas da Frota
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("path,method", [
+    ("/api/settings", "GET"),
+    ("/api/settings", "POST"),
+    ("/api/machines/update", "POST"),
+    ("/api/machines/cache", "POST"),
+])
+def test_novos_endpoints_exigem_token(path, method):
+    resp = requests.request(method, f"{LOCAL_BASE_URL}{path}", timeout=TIMEOUT, data="{}")
+    if resp.status_code == 404:
+        pytest.skip("monitor local ainda numa versao sem esse endpoint")
+    assert resp.status_code == 401
+
+
+def test_settings_devolve_configuracao_valida():
+    login = requests.post(f"{LOCAL_BASE_URL}/api/login", timeout=TIMEOUT, json={
+        "username": "admin",
+        "password_hash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    })
+    if login.status_code != 200:
+        pytest.skip("monitor local nao usa a senha padrao")
+    auth = {"Authorization": "Bearer " + login.json()["token"]}
+    resp = requests.get(f"{LOCAL_BASE_URL}/api/settings", timeout=TIMEOUT, headers=auth)
+    if resp.status_code == 404:
+        pytest.skip("monitor local ainda numa versao sem /api/settings")
+    cfg = resp.json()
+    assert 1 <= cfg["stuck_threshold_minutes"] <= 120
+    assert 10 <= cfg["check_interval_seconds"] <= 600
+    assert isinstance(cfg["update_hours"], list) and all(0 <= h <= 23 for h in cfg["update_hours"])
+    # Valor invalido e recusado sem salvar nada.
+    ruim = requests.post(f"{LOCAL_BASE_URL}/api/settings", timeout=TIMEOUT, headers=auth,
+                         json={"stuck_threshold_minutes": 999})
+    assert ruim.status_code == 400
+    assert requests.get(f"{LOCAL_BASE_URL}/api/settings", timeout=TIMEOUT, headers=auth).json() == cfg

@@ -21,7 +21,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 APP_DIR = REPO_ROOT / "dist_spooler" / "app"
 OUT_DIR = REPO_ROOT / "docs" / "screenshots"
 BASE = "http://painel.exemplo:8989"
-VERSAO = "2026.09.24.4"
+VERSAO = "2026.09.28.2"
 
 FOTOS_POR_HOST = {
     "PC-ADMIN01": "Dell_OptiPlex_7050.png",
@@ -37,6 +37,12 @@ MAQUINAS = [
     {"id": "a3", "name": "Vendas - Notebook", "host": "NB-VENDAS03"},
     {"id": "a4", "name": "Estoque", "host": "PC-ESTOQUE04"},
 ]
+
+# Estado da API simulada, que os testes de navegador (tools/tests/test_dashboard_*.py)
+# podem inspecionar/reiniciar: configuracoes salvas e tudo que o painel enviou.
+CONFIG = {"stuck_threshold_minutes": 5, "check_interval_seconds": 30, "update_hours": [11, 15]}
+ENVIOS = []
+SEM_CONFIGURACOES = {"NB-VENDAS03"}
 
 HISTORICO = [
     {"timestamp": "24/09/2026 10:42:15", "type": "Automático", "reason": "Fila travada há mais de 5 minutos",
@@ -97,6 +103,29 @@ def responder(route):
 
     if host in OFFLINE:
         return route.abort()
+    metodo = route.request.method
+    if metodo == "OPTIONS":  # preflight CORS dos POSTs do painel para outras maquinas
+        return route.fulfill(status=204, body="", headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS"})
+    corpo = json.loads(route.request.post_data or "{}") if metodo == "POST" else None
+    if metodo == "POST":
+        ENVIOS.append({"host": host, "path": path, "body": corpo})
+    if path == "/api/settings":
+        if host in SEM_CONFIGURACOES:  # simula maquina numa versao antiga do monitor
+            return route.fulfill(status=404, body="Not Found", headers={"Access-Control-Allow-Origin": "*"})
+        if metodo == "POST":
+            CONFIG.update(corpo)
+            return json_resp({"success": True, "settings": CONFIG})
+        return json_resp(CONFIG)
+    if path == "/api/machines/update":
+        for m in MAQUINAS:
+            if m["id"] == corpo["id"]:
+                m.update(name=corpo["name"], host=corpo["host"])
+        return json_resp({"success": True})
+    if path == "/api/machines/cache":
+        return json_resp({"success": True})
     if path in ("/", "/index.html"):
         return route.fulfill(content_type="text/html; charset=utf-8",
                              body=(APP_DIR / "dashboard.html").read_bytes())

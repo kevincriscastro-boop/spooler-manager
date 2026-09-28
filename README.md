@@ -20,6 +20,13 @@ e fica registrado.
 - **Frota de máquinas:** cadastre outros PCs pelo nome e veja todos num só lugar.
   Cada card mostra fila, impressoras, espaço em disco e modelo do equipamento, com
   reinício e atualização remotos e acesso rápido pelo AnyDesk.
+- **Filtros e busca na Frota:** filtre por sistema operacional, modelo e situação
+  (online, offline, spooler parado, desatualizada, pouco disco), com contagem por opção.
+  Também dá pra buscar por apelido, nome ou impressora. Máquinas offline continuam
+  mostrando a última leitura, que fica guardada no monitor.
+- **Configurações pelo painel:** tempo para considerar a fila travada, intervalo de
+  verificação e horários da atualização automática, nesta máquina ou **aplicados em
+  toda a Frota** de uma vez. Cada card também pode ser editado (apelido e nome/IP).
 - **Foto do equipamento por modelo:** cada máquina identifica o próprio fabricante e
   modelo e mostra a foto correspondente da biblioteca
   [`photos-by-model/`](dist_spooler/app/photos-by-model). Uma foto serve para todas as

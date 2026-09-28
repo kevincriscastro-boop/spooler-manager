@@ -271,6 +271,52 @@ function Save-JsonData($obj) {
     } catch {}
 }
 
+# Configuracoes do monitor editaveis pelo painel (settings do data.json), com
+# valores padrao para o que nao estiver salvo. O vigia (WatchdogSpooler.ps1)
+# le update_hours do mesmo lugar.
+$global:limitesConfig = @{
+    stuck_threshold_minutes = @{ padrao = 5;  min = 1;  max = 120 }
+    check_interval_seconds  = @{ padrao = 30; min = 10; max = 600 }
+}
+function Get-Configuracoes {
+    $s = (Get-JsonData).settings
+    $cfg = [ordered]@{}
+    foreach ($k in $global:limitesConfig.Keys) {
+        $v = if ($s -and $s.$k) { [int]$s.$k } else { $global:limitesConfig[$k].padrao }
+        $cfg[$k] = [Math]::Min($global:limitesConfig[$k].max, [Math]::Max($global:limitesConfig[$k].min, $v))
+    }
+    $salvas = @(if ($s -and $s.update_hours) { $s.update_hours })
+    $horas = @($salvas | Where-Object { "$_" -match '^\d{1,2}$' -and [int]$_ -le 23 } | ForEach-Object { [int]$_ })
+    # @() por fora: um "if" com lista de 1 item devolveria o item solto (PS 5.1)
+    $cfg.update_hours = @(if ($horas.Count) { $horas | Sort-Object -Unique } else { 11, 15 })
+    return $cfg
+}
+
+# Valida e salva as configuracoes enviadas pelo painel. Devolve a mensagem de
+# erro (texto) ou $null se deu certo - nada e salvo se algum valor for invalido.
+function Set-Configuracoes($novas) {
+    $d = Get-JsonData
+    if (-not $d.settings) { $d | Add-Member -MemberType NoteProperty -Name "settings" -Value ([PSCustomObject]@{}) -Force }
+    foreach ($k in $global:limitesConfig.Keys) {
+        if ($null -eq $novas.$k) { continue }
+        $lim = $global:limitesConfig[$k]; $v = 0
+        if (-not [int]::TryParse([string]$novas.$k, [ref]$v) -or $v -lt $lim.min -or $v -gt $lim.max) {
+            return "$k deve ser um numero entre $($lim.min) e $($lim.max)"
+        }
+        $d.settings | Add-Member -MemberType NoteProperty -Name $k -Value $v -Force
+    }
+    if ($null -ne $novas.update_hours) {
+        $horas = @($novas.update_hours)
+        $validas = @($horas | Where-Object { "$_" -match '^\d{1,2}$' -and [int]$_ -le 23 } | ForEach-Object { [int]$_ } | Sort-Object -Unique)
+        if ($validas.Count -lt 1 -or $validas.Count -gt 6 -or $validas.Count -ne @($horas | Sort-Object -Unique).Count) {
+            return "update_hours deve ter de 1 a 6 horarios entre 0 e 23"
+        }
+        $d.settings | Add-Member -MemberType NoteProperty -Name "update_hours" -Value $validas -Force
+    }
+    Save-JsonData $d
+    return $null
+}
+
 function Test-AuthToken($request) {
     $authHeader = $request.Headers["Authorization"]
     if (-not $authHeader) { return $false }
@@ -282,11 +328,7 @@ function Test-AuthToken($request) {
 }
 
 function Test-FilaTravada {
-    $d = Get-JsonData
-    $thresholdMinutes = 5
-    if ($d -and $d.settings.stuck_threshold_minutes) {
-        $thresholdMinutes = [int]$d.settings.stuck_threshold_minutes
-    }
+    $thresholdMinutes = (Get-Configuracoes).stuck_threshold_minutes
 
     # Evita reinícios repetidos em cascata (cooldown de 2 minutos)
     $diffCooldown = (Get-Date) - $global:lastAutoRestart
@@ -344,7 +386,7 @@ function Test-FilaTravada {
 $asyncResult = $listener.BeginGetContext($null, $null)
 $nextQueueCheck = Get-Date
 
-Write-Host "[MONITOR] Monitoramento do Spooler ativo. Limiar: 5 minutos." -ForegroundColor Cyan
+Write-Host "[MONITOR] Monitoramento do Spooler ativo. Limiar: $((Get-Configuracoes).stuck_threshold_minutes) minutos." -ForegroundColor Cyan
 
 while ($listener.IsListening) {
     # 4.1. Atende Requisições HTTP
@@ -539,6 +581,72 @@ while ($listener.IsListening) {
                 Save-JsonData $d
                 Send-HttpResponse -Response $res -Content '{"success":true}' -ContentType "application/json"
             }
+            elseif ($path -eq "/api/machines/update" -and $method -eq "POST") {
+                # Edita apelido e/ou nome/IP de uma maquina da Frota, sem precisar
+                # remover e cadastrar de novo (a ultima leitura guardada continua).
+                if (-not (Test-AuthToken $req)) {
+                    Send-HttpResponse -Response $res -Content '{"error":"Não autorizado"}' -ContentType "application/json" -StatusCode 401
+                    continue
+                }
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body = $reader.ReadToEnd() | ConvertFrom-Json
+                $d = Get-JsonData
+                $maquina = @($d.machines) | Where-Object { $_.id -eq $body.id } | Select-Object -First 1
+                $nome = "$($body.name)".Trim(); $hostNovo = "$($body.host)".Trim()
+                if (-not $maquina) {
+                    Send-HttpResponse -Response $res -Content '{"success":false,"message":"Máquina não encontrada."}' -ContentType "application/json" -StatusCode 404
+                } elseif (-not $nome -or -not $hostNovo -or $hostNovo -notmatch '^[A-Za-z0-9._-]+$') {
+                    Send-HttpResponse -Response $res -Content '{"success":false,"message":"Informe o apelido e um nome de PC ou IP válido (letras, números, ponto, hífen)."}' -ContentType "application/json" -StatusCode 400
+                } else {
+                    $maquina.name = $nome
+                    $maquina.host = $hostNovo
+                    Save-JsonData $d
+                    Send-HttpResponse -Response $res -Content (@{ success = $true; machine = $maquina } | ConvertTo-Json -Depth 6) -ContentType "application/json"
+                }
+            }
+            elseif ($path -eq "/api/machines/cache" -and $method -eq "POST") {
+                # O painel manda aqui a ultima leitura boa de uma maquina da Frota
+                # (specs e/ou status) - fica guardada junto dela no data.json, para
+                # continuar aparecendo com a maquina offline, em qualquer navegador.
+                if (-not (Test-AuthToken $req)) {
+                    Send-HttpResponse -Response $res -Content '{"error":"Não autorizado"}' -ContentType "application/json" -StatusCode 401
+                    continue
+                }
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body = $reader.ReadToEnd() | ConvertFrom-Json
+                $d = Get-JsonData
+                $maquina = @($d.machines) | Where-Object { $_.id -eq $body.id } | Select-Object -First 1
+                if (-not $maquina) {
+                    Send-HttpResponse -Response $res -Content '{"success":false}' -ContentType "application/json" -StatusCode 404
+                    continue
+                }
+                if ($body.specs)  { $maquina | Add-Member -MemberType NoteProperty -Name "last_specs"  -Value $body.specs  -Force }
+                if ($body.health) { $maquina | Add-Member -MemberType NoteProperty -Name "last_health" -Value $body.health -Force }
+                $maquina | Add-Member -MemberType NoteProperty -Name "last_seen" -Value ((Get-Date).ToString("o")) -Force
+                Save-JsonData $d
+                Send-HttpResponse -Response $res -Content '{"success":true}' -ContentType "application/json"
+            }
+            elseif ($path -eq "/api/settings" -and $method -eq "GET") {
+                if (-not (Test-AuthToken $req)) {
+                    Send-HttpResponse -Response $res -Content '{"error":"Não autorizado"}' -ContentType "application/json" -StatusCode 401
+                    continue
+                }
+                Send-HttpResponse -Response $res -Content (Get-Configuracoes | ConvertTo-Json) -ContentType "application/json"
+            }
+            elseif ($path -eq "/api/settings" -and $method -eq "POST") {
+                if (-not (Test-AuthToken $req)) {
+                    Send-HttpResponse -Response $res -Content '{"error":"Não autorizado"}' -ContentType "application/json" -StatusCode 401
+                    continue
+                }
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body = $reader.ReadToEnd() | ConvertFrom-Json
+                $erro = Set-Configuracoes $body
+                if ($erro) {
+                    Send-HttpResponse -Response $res -Content (@{ success = $false; message = $erro } | ConvertTo-Json) -ContentType "application/json" -StatusCode 400
+                } else {
+                    Send-HttpResponse -Response $res -Content (@{ success = $true; settings = Get-Configuracoes } | ConvertTo-Json -Depth 3) -ContentType "application/json"
+                }
+            }
             elseif ($path -eq "/" -or $path -eq "/index.html") {
                 if (Test-Path $dashFile) {
                     $html = Get-Content -Path $dashFile -Raw -Encoding UTF8
@@ -640,10 +748,10 @@ while ($listener.IsListening) {
         }
     }
 
-    # 4.2. Checagem periódica da fila de impressão a cada 30 segundos
+    # 4.2. Checagem periódica da fila de impressão (intervalo configurável pelo painel, padrão 30 s)
     if ((Get-Date) -ge $nextQueueCheck) {
         Test-FilaTravada
-        $nextQueueCheck = (Get-Date).AddSeconds(30)
+        $nextQueueCheck = (Get-Date).AddSeconds((Get-Configuracoes).check_interval_seconds)
     }
 
     Start-Sleep -Milliseconds 200

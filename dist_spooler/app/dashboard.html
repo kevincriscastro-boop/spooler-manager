@@ -472,6 +472,35 @@
     .add-machine-form input {
       max-width: 220px;
     }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    input[type="number"]:focus, select:focus { border-color: var(--primary); }
+    select option { background: #1e2433; color: #fff; }
+
+    /* Configurações do monitor */
+    .settings-bar { flex-direction: column; align-items: stretch; }
+    .settings-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; }
+    .settings-form .form-group { margin-bottom: 0; }
+    .settings-actions { grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Filtros da Frota */
+    .fleet-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+    .fleet-filters input { flex: 2 1 240px; }
+    .fleet-filters select { flex: 1 1 170px; width: auto; }
+    .filter-count { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
+
+    @media (max-width: 720px) {
+      .settings-form { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -711,6 +740,32 @@
         </div>
       </div>
 
+      <!-- Configurações do Monitor -->
+      <h3 class="section-title">
+        <span>Configurações do Monitor</span>
+      </h3>
+      <div class="actions-bar settings-bar" style="margin-top: 0;">
+        <form class="settings-form" onsubmit="event.preventDefault(); salvarConfiguracoes(false);">
+          <div class="form-group">
+            <label for="cfg-limiar">Fila travada após (minutos)</label>
+            <input type="number" id="cfg-limiar" min="1" max="120" required>
+          </div>
+          <div class="form-group">
+            <label for="cfg-intervalo">Verificar a fila a cada (segundos)</label>
+            <input type="number" id="cfg-intervalo" min="10" max="600" required>
+          </div>
+          <div class="form-group">
+            <label for="cfg-horas">Horários de atualização automática</label>
+            <input type="text" id="cfg-horas" placeholder="ex: 11, 15" required>
+          </div>
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-primary">💾 Salvar nesta máquina</button>
+            <button type="button" class="btn btn-ghost" onclick="salvarConfiguracoes(true)">🌐 Aplicar em toda a Frota</button>
+          </div>
+        </form>
+        <div id="cfg-resultado" class="machine-details" style="margin-top: 12px;"></div>
+      </div>
+
       <!-- Tabela de Histórico -->
       <h3 class="section-title">
         <span>Histórico de Atividades</span>
@@ -759,11 +814,45 @@
           <button class="btn btn-ghost btn-sm" onclick="loadMachines()">🔄 Atualizar</button>
         </h3>
 
+        <div class="fleet-filters">
+          <input type="text" id="filtro-busca" placeholder="🔎 Buscar por apelido, nome ou impressora" oninput="aplicarFiltros()">
+          <select id="filtro-so" onchange="aplicarFiltros()"></select>
+          <select id="filtro-modelo" onchange="aplicarFiltros()"></select>
+          <select id="filtro-situacao" onchange="aplicarFiltros()"></select>
+          <span id="filtro-contagem" class="filter-count"></span>
+        </div>
+
         <div class="grid-stats" id="machines-grid">
           <p style="color: var(--text-muted);">Nenhuma máquina cadastrada ainda. Adicione uma acima.</p>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- MODAL DE EDITAR MÁQUINA DA FROTA -->
+  <div id="modal-editar" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 6px; font-size: 1.25rem;">Editar Máquina</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Troque o apelido ou o nome/IP (ex: depois de renomear o computador). A última leitura guardada continua.</p>
+
+      <div id="modal-editar-alert" class="alert"></div>
+
+      <form onsubmit="event.preventDefault(); salvarEdicaoMaquina();">
+        <input type="hidden" id="editar-id">
+        <div class="form-group">
+          <label for="editar-nome">Apelido</label>
+          <input type="text" id="editar-nome" required>
+        </div>
+        <div class="form-group">
+          <label for="editar-host">Nome do PC ou IP</label>
+          <input type="text" id="editar-host" required pattern="[A-Za-z0-9._\-]+">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-editar').classList.add('hidden')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- MODAL DE TROCAR SENHA -->
@@ -1107,6 +1196,7 @@
       loadStats();
       loadMachineSpecsInto("dash");
       checkUpdateVersionBadge("dash");
+      carregarConfiguracoes();
       if (autoRefreshTimer) clearInterval(autoRefreshTimer);
       autoRefreshTimer = setInterval(() => {
         loadStats();
@@ -1311,10 +1401,46 @@
         if (res.status === 401) { handleLogout(); return; }
         const data = await res.json();
         machinesCache = data.machines || [];
+        // A ultima leitura guardada no monitor (data.json) vale para qualquer
+        // navegador: completa o cache local quando ele nao tem nada ou esta mais antigo.
+        machinesCache.forEach(m => {
+          const tsMonitor = m.last_seen ? Date.parse(m.last_seen) : 0;
+          if (m.last_specs && (!lastSpecsCache[m.id] || (lastSpecsCache[m.id]._ts || 0) < tsMonitor)) {
+            lastSpecsCache[m.id] = { ...m.last_specs, _ts: tsMonitor };
+          }
+          if (m.last_health && (!lastHealthCache[m.id] || (lastHealthCache[m.id]._ts || 0) < tsMonitor)) {
+            lastHealthCache[m.id] = { ...m.last_health, _ts: tsMonitor };
+          }
+        });
+        if (!versaoMaisRecente) carregarVersaoMaisRecente();
         renderMachines();
       } catch (e) {
         console.error("Erro ao carregar maquinas:", e);
       }
+    }
+
+    // Guarda no monitor local a ultima leitura boa de uma maquina da Frota.
+    // Status: no maximo 1 vez por minuto por maquina (o painel consulta a cada 5 s).
+    const ultimoEnvioStatus = {};
+    function enviarLeituraAoMonitor(id, dados) {
+      if (dados.health) {
+        if (Date.now() - (ultimoEnvioStatus[id] || 0) < 60000) delete dados.health;
+        else ultimoEnvioStatus[id] = Date.now();
+      }
+      if (!dados.health && !dados.specs) return;
+      fetch("/api/machines/cache", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + authToken },
+        body: JSON.stringify({ id, ...dados })
+      }).catch(() => {}); // monitor local antigo (sem o endpoint) - fica so no navegador
+    }
+
+    let versaoMaisRecente = null;
+    async function carregarVersaoMaisRecente() {
+      try {
+        const d = await (await fetch("/api/check-update")).json();
+        if (d.latest_version) { versaoMaisRecente = d.latest_version; aplicarFiltros(); }
+      } catch (e) {}
     }
 
     async function addMachine() {
@@ -1455,6 +1581,7 @@
             <span id="anydesk-btn-${m.id}"></span>
             <button class="btn btn-action-force btn-sm" onclick="forceRestartRemote('${m.host}')">⚡ Forçar Reinício</button>
             <button class="btn btn-ghost btn-sm" onclick="forceUpdateRemote('${m.host}')">⬇️ Forçar Atualização</button>
+            <button class="btn btn-ghost btn-sm" onclick="abrirEdicaoMaquina('${m.id}')">✏️ Editar</button>
             <button class="btn btn-ghost btn-sm" style="color: var(--danger);" onclick="removeMachine('${m.id}')">Remover</button>
           </div>
         `;
@@ -1462,6 +1589,7 @@
         loadMachineSpecsRemote(m.id, m.host);
       });
 
+      aplicarFiltros();
       refreshMachinesHealth();
     }
 
@@ -1499,9 +1627,12 @@
       const s = await fetchMachineSpecs(host);
       if (!document.getElementById(`specs-${id}`)) return; // card pode ter sido removido nesse meio tempo
       if (s) {
-        lastSpecsCache[id] = s;
+        const mudou = JSON.stringify(s) !== JSON.stringify({ ...lastSpecsCache[id], _ts: undefined });
+        lastSpecsCache[id] = { ...s, _ts: Date.now() };
         saveSpecsCacheToStorage();
+        if (mudou) enviarLeituraAoMonitor(id, { specs: s });
       }
+      aplicarFiltros();
       specsEl.innerHTML = buildSpecsHtml(s || lastSpecsCache[id]);
     }
 
@@ -1539,6 +1670,8 @@
         if (!health) {
           dot.className = "dot down";
           status.textContent = "Offline";
+          situacaoMaquina[m.id] = "offline";
+          aplicarFiltros();
           const cached = lastHealthCache[m.id];
           if (cached) {
             details.innerHTML = buildMachineDetailsHtml(cached) +
@@ -1550,8 +1683,12 @@
         }
 
         health._checadoEm = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+        health._ts = Date.now();
         lastHealthCache[m.id] = health;
         saveHealthCacheToStorage();
+        enviarLeituraAoMonitor(m.id, { health });
+        situacaoMaquina[m.id] = health.spooler_status === "Running" ? "online" : "parado";
+        aplicarFiltros();
 
         // Estava offline quando o card foi criado e ainda nao temos as specs:
         // busca agora que ela respondeu, sem precisar recarregar a pagina.
@@ -1662,6 +1799,188 @@
         alert(data.message || "Atualização iniciada!");
       } catch (e) {
         alert("Erro ao comunicar com a máquina remota: " + e);
+      }
+    }
+
+    // ===================== FILTROS DA FROTA =====================
+    // Tudo no navegador, sobre o que ja esta carregado (inclusive a ultima
+    // leitura guardada de maquinas offline) - nao consulta nada a mais.
+    const situacaoMaquina = {}; // id -> "online" | "offline" | "parado"
+
+    function nomeSO(s) { return s && s.os_caption ? s.os_caption.replace(/^Microsoft\s+/i, "") : null; }
+    function nomeModelo(s) {
+      if (!s || !s.model) return null;
+      const fabricante = (s.manufacturer || "").replace(/\b(Inc\.?|Corp\.?|Corporation|Ltd\.?|Co\.?|LLC)\b/gi, "").replace(/[\s.,]+$/, "").trim();
+      return [fabricante, s.model].filter(Boolean).join(" ");
+    }
+    function discoBaixo(h) { return h && h.disk_total_gb && (h.disk_free_gb / h.disk_total_gb) < 0.2; }
+    function desatualizada(h) { return !!(versaoMaisRecente && h && h.version && h.version !== versaoMaisRecente); }
+
+    function preencherSelect(el, rotuloTodos, contagens) {
+      const atual = el.value;
+      const opcoes = [`<option value="">${rotuloTodos}</option>`];
+      [...contagens.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([valor, n]) => {
+        const v = valor.replace(/"/g, "&quot;");
+        opcoes.push(`<option value="${v}">${valor} (${n})</option>`);
+      });
+      el.innerHTML = opcoes.join("");
+      el.value = contagens.has(atual) ? atual : "";
+    }
+
+    function aplicarFiltros() {
+      const busca = document.getElementById("filtro-busca");
+      if (!busca) return;
+      const contaSO = new Map(), contaModelo = new Map();
+      const contaSit = { online: 0, offline: 0, parado: 0, desatualizada: 0, disco: 0 };
+      machinesCache.forEach(m => {
+        const s = lastSpecsCache[m.id], h = lastHealthCache[m.id];
+        const so = nomeSO(s) || "Sem informação", mod = nomeModelo(s) || "Sem informação";
+        contaSO.set(so, (contaSO.get(so) || 0) + 1);
+        contaModelo.set(mod, (contaModelo.get(mod) || 0) + 1);
+        if (situacaoMaquina[m.id]) contaSit[situacaoMaquina[m.id]]++;
+        if (desatualizada(h)) contaSit.desatualizada++;
+        if (discoBaixo(h)) contaSit.disco++;
+      });
+      preencherSelect(document.getElementById("filtro-so"), "Todos os sistemas", contaSO);
+      preencherSelect(document.getElementById("filtro-modelo"), "Todos os modelos", contaModelo);
+
+      const selSit = document.getElementById("filtro-situacao"), sitAtual = selSit.value;
+      selSit.innerHTML = [
+        ["", "Todas as situações"], ["online", `Online (${contaSit.online})`], ["offline", `Offline (${contaSit.offline})`],
+        ["parado", `Spooler parado (${contaSit.parado})`], ["desatualizada", `Desatualizada (${contaSit.desatualizada})`],
+        ["disco", `Pouco disco (${contaSit.disco})`],
+      ].map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
+      selSit.value = sitAtual;
+
+      const termo = busca.value.trim().toLowerCase();
+      const fSO = document.getElementById("filtro-so").value, fMod = document.getElementById("filtro-modelo").value;
+      let visiveis = 0;
+      machinesCache.forEach(m => {
+        const card = document.getElementById(`machine-${m.id}`);
+        if (!card) return;
+        const s = lastSpecsCache[m.id], h = lastHealthCache[m.id];
+        const texto = [m.name, m.host, ...((h && h.printers) || [])].join(" ").toLowerCase();
+        const passa =
+          (!termo || texto.includes(termo)) &&
+          (!fSO || (nomeSO(s) || "Sem informação") === fSO) &&
+          (!fMod || (nomeModelo(s) || "Sem informação") === fMod) &&
+          (!sitAtual ||
+            (sitAtual === "desatualizada" ? desatualizada(h) :
+             sitAtual === "disco" ? discoBaixo(h) : situacaoMaquina[m.id] === sitAtual));
+        card.style.display = passa ? "" : "none";
+        if (passa) visiveis++;
+      });
+      document.getElementById("filtro-contagem").textContent =
+        visiveis === machinesCache.length ? `${machinesCache.length} máquina(s)` : `${visiveis} de ${machinesCache.length} máquina(s)`;
+    }
+
+    // ===================== EDITAR MÁQUINA DA FROTA =====================
+    function abrirEdicaoMaquina(id) {
+      const m = machinesCache.find(x => String(x.id) === String(id));
+      if (!m) return;
+      document.getElementById("editar-id").value = m.id;
+      document.getElementById("editar-nome").value = m.name;
+      document.getElementById("editar-host").value = m.host;
+      document.getElementById("modal-editar-alert").style.display = "none";
+      document.getElementById("modal-editar").classList.remove("hidden");
+    }
+
+    async function salvarEdicaoMaquina() {
+      const id = document.getElementById("editar-id").value;
+      const name = document.getElementById("editar-nome").value.trim();
+      const host = document.getElementById("editar-host").value.trim();
+      const alerta = document.getElementById("modal-editar-alert");
+      try {
+        const res = await fetch("/api/machines/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + authToken },
+          body: JSON.stringify({ id, name, host })
+        });
+        const d = await res.json().catch(() => ({}));
+        if (!res.ok || !d.success) {
+          alerta.className = "alert alert-danger";
+          alerta.textContent = d.message || "Não foi possível salvar.";
+          alerta.style.display = "block";
+          return;
+        }
+        document.getElementById("modal-editar").classList.add("hidden");
+        // Card recriado do zero: o nome/IP entra no endereco da foto e dos botoes.
+        const card = document.getElementById(`machine-${id}`);
+        if (card) card.remove();
+        loadMachines();
+      } catch (e) {
+        alerta.className = "alert alert-danger";
+        alerta.textContent = "Erro ao comunicar com o monitor: " + e;
+        alerta.style.display = "block";
+      }
+    }
+
+    // ===================== CONFIGURAÇÕES DO MONITOR =====================
+    async function carregarConfiguracoes() {
+      try {
+        const res = await fetch("/api/settings", { headers: { "Authorization": "Bearer " + authToken } });
+        if (!res.ok) return;
+        const c = await res.json();
+        document.getElementById("cfg-limiar").value = c.stuck_threshold_minutes;
+        document.getElementById("cfg-intervalo").value = c.check_interval_seconds;
+        document.getElementById("cfg-horas").value = (c.update_hours || []).join(", ");
+      } catch (e) {}
+    }
+
+    async function enviarConfiguracoes(base, token, cfg) {
+      const res = await fetch(`${base}/api/settings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify(cfg)
+      });
+      if (res.status === 404) throw new Error("versão antiga do monitor - atualize a máquina primeiro");
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok || !d.success) throw new Error(d.message || `HTTP ${res.status}`);
+    }
+
+    async function salvarConfiguracoes(emTodaFrota) {
+      const saida = document.getElementById("cfg-resultado");
+      const cfg = {
+        stuck_threshold_minutes: parseInt(document.getElementById("cfg-limiar").value, 10),
+        check_interval_seconds: parseInt(document.getElementById("cfg-intervalo").value, 10),
+        update_hours: document.getElementById("cfg-horas").value.split(/[\s,;]+/).filter(Boolean).map(Number),
+      };
+      if (cfg.update_hours.some(h => !Number.isInteger(h) || h < 0 || h > 23)) {
+        saida.innerHTML = `<span style="color: var(--danger);">Horários devem ser horas cheias entre 0 e 23, separadas por vírgula (ex: 11, 15).</span>`;
+        return;
+      }
+      try {
+        await enviarConfiguracoes("", authToken, cfg);
+      } catch (e) {
+        saida.innerHTML = `<span style="color: var(--danger);">Não salvou nesta máquina: ${e.message}</span>`;
+        return;
+      }
+      if (!emTodaFrota) {
+        saida.innerHTML = `<span style="color: var(--success);">✓ Configurações salvas nesta máquina.</span>`;
+        return;
+      }
+
+      if (!machinesCache.length) await loadMachines();
+      if (!confirm(`Aplicar estas configurações nas ${machinesCache.length} máquina(s) da Frota?`)) return;
+      const hash = await getFleetPassHash();
+      if (!hash) return;
+      const linhas = ["✓ Esta máquina"];
+      saida.innerHTML = linhas.join("<br>") + "<br>Aplicando na Frota...";
+      for (const m of machinesCache) {
+        const base = `http://${m.host}:8989`;
+        try {
+          const login = await (await fetch(`${base}/api/login`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: "admin", password_hash: hash })
+          })).json();
+          if (!login.success) throw new Error("senha da Frota incorreta nessa máquina");
+          await enviarConfiguracoes(base, login.token, cfg);
+          linhas.push(`✓ ${m.name} (${m.host})`);
+        } catch (e) {
+          const motivo = e instanceof TypeError ? "offline ou inacessível" : e.message;
+          linhas.push(`<span style="color: var(--danger);">✗ ${m.name} (${m.host}): ${motivo}</span>`);
+        }
+        saida.innerHTML = linhas.join("<br>");
       }
     }
 

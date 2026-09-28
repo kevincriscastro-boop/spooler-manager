@@ -61,9 +61,12 @@ def test_powershell_model_key_matches_python():
     assert saida == [model_key(fab, mod) for fab, mod in CASOS_CHAVE]
 
 
+def _monitor_texto():
+    return (Path(__file__).resolve().parents[2] / "dist_spooler" / "app" / "SpoolerMonitor.ps1").read_text(encoding="utf-8-sig")
+
+
 def _funcao_do_monitor(nome):
-    monitor = (Path(__file__).resolve().parents[2] / "dist_spooler" / "app" / "SpoolerMonitor.ps1").read_text(encoding="utf-8-sig")
-    return re.search(rf"^function {nome} \{{.*?^\}}", monitor, re.S | re.M).group(0)
+    return re.search(rf"^function {nome}\b.*?^\}}", _monitor_texto(), re.S | re.M).group(0)
 
 
 @pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
@@ -93,6 +96,37 @@ def test_fila_snapshot_nao_trava_com_spooler_preso():
         "normal: ok=True impressoras=1 trabalhos=2",
         "cache: mesmo objeto=True",
         "travado: ok=False impressoras=1 em_ate_12s=True",
+    ]
+
+
+@pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
+def test_configuracoes_do_monitor():
+    # Get-JsonData/Save-JsonData simulados em memoria (sem tocar no data.json real).
+    limites = re.search(r"^\$global:limitesConfig = @\{.*?^\}", _monitor_texto(), re.S | re.M).group(0)
+    script = "\n".join([
+        limites,
+        _funcao_do_monitor("Get-Configuracoes"),
+        _funcao_do_monitor("Set-Configuracoes"),
+        "$global:dados = [PSCustomObject]@{ settings = [PSCustomObject]@{ port = 8989 } }",
+        "function Get-JsonData { $global:dados }",
+        "function Save-JsonData($o) { $global:dados = $o }",
+        "'padrao: ' + (Get-Configuracoes | ConvertTo-Json -Compress)",
+        "'invalido: ' + (Set-Configuracoes ([PSCustomObject]@{ stuck_threshold_minutes = 0 }))",
+        "'hora invalida: ' + (Set-Configuracoes ([PSCustomObject]@{ update_hours = @(9, 25) }))",
+        "'salvou: ' + [string]::IsNullOrEmpty((Set-Configuracoes ([PSCustomObject]@{ stuck_threshold_minutes = 10; update_hours = @(9) })))",
+        "'depois: ' + (Get-Configuracoes | ConvertTo-Json -Compress)",
+        "'porta preservada: ' + $global:dados.settings.port",
+    ])
+    saida = subprocess.run(["powershell", "-NoProfile", "-Command", script],
+                           capture_output=True, text=True, check=True, timeout=60).stdout.splitlines()
+    assert saida == [
+        'padrao: {"stuck_threshold_minutes":5,"check_interval_seconds":30,"update_hours":[11,15]}',
+        "invalido: stuck_threshold_minutes deve ser um numero entre 1 e 120",
+        "hora invalida: update_hours deve ter de 1 a 6 horarios entre 0 e 23",
+        "salvou: True",
+        # Um horario so continua sendo lista (PS 5.1 tende a "desembrulhar").
+        'depois: {"stuck_threshold_minutes":10,"check_interval_seconds":30,"update_hours":[9]}',
+        "porta preservada: 8989",
     ]
 
 

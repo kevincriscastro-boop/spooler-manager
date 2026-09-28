@@ -81,13 +81,22 @@ try {
     $lastCheckFile = Join-Path $AppDir "LastUpdateCheck.txt"
     $ultimoDiaChecado = if (Test-Path $lastCheckFile) { (Get-Content $lastCheckFile -Raw -ErrorAction Stop).Trim() } else { "" }
 
-    $isForcedWindow = (($now.Hour -eq 11) -or ($now.Hour -eq 15)) -and ($now.Minute -lt 5)
+    # Horarios de atualizacao: configuraveis pelo painel (settings.update_hours
+    # do data.json - ver Get-Configuracoes no SpoolerMonitor.ps1); padrao 11h e 15h.
+    $horarios = @(11, 15)
+    try {
+        $salvos = @((Get-Content (Join-Path $AppDir "data.json") -Raw -Encoding UTF8 -ErrorAction Stop | ConvertFrom-Json).settings.update_hours |
+            Where-Object { "$_" -match '^\d{1,2}$' -and [int]$_ -le 23 } | ForEach-Object { [int]$_ })
+        if ($salvos.Count) { $horarios = @($salvos | Sort-Object -Unique) }
+    } catch {}
 
-    # Catch-up: se a maquina ja passou das 15h05 de hoje e ainda nao rodou
-    # nenhuma verificacao hoje (ex: ficou desligada durante as duas janelas),
-    # verifica assim que o vigia rodar de novo - sem esperar o dia seguinte.
-    $passouDasDuasJanelasHoje = ($now.Hour -gt 15) -or ($now.Hour -eq 15 -and $now.Minute -ge 5)
-    $isCatchUp = $passouDasDuasJanelasHoje -and ($ultimoDiaChecado -ne $hoje)
+    $isForcedWindow = ($horarios -contains $now.Hour) -and ($now.Minute -lt 5)
+
+    # Catch-up: se a maquina ja passou da ultima janela do dia (+5 min) e ainda
+    # nao rodou nenhuma verificacao hoje (ex: ficou desligada em todas as
+    # janelas), verifica assim que o vigia rodar de novo - sem esperar o dia seguinte.
+    $ultimaJanela = $now.Date.AddHours(($horarios | Measure-Object -Maximum).Maximum).AddMinutes(5)
+    $isCatchUp = ($now -ge $ultimaJanela) -and ($ultimoDiaChecado -ne $hoje)
 
     if (($isForcedWindow -or $isCatchUp) -and $updateBaseUrl) {
         $localVersionFile = Join-Path $AppDir "VERSION"

@@ -1080,7 +1080,9 @@
       const running = health.spooler_status === "Running";
       dot.className = "dot " + (running ? "" : "down");
       txt.textContent = running ? "Spooler Ativo" : "Spooler Parado";
-      details.innerHTML = buildMachineDetailsHtml(health, { skipQueueAndStats: true });
+      details.innerHTML = buildMachineDetailsHtml(health, { skipQueueAndStats: true, skipDisk: true });
+      healthLocal = health;
+      renderSpecsLocal("home");
 
       const stats = health.stats || {};
       document.getElementById("home-val-auto").textContent = stats.restarts_auto || 0;
@@ -1116,25 +1118,40 @@
       }
     }
 
-    async function loadMachineSpecsInto(prefix) {
+    // Card de identificacao desta maquina (tela inicial e "Este Computador"):
+    // mesmo layout dos cards da Frota - hardware (inclusive disco) em cima,
+    // o que muda o tempo todo embaixo. Specs vem do /api/machine-info e o
+    // disco do /api/health, que chegam em momentos diferentes.
+    let specsLocal = null, healthLocal = null;
+
+    function renderSpecsLocal(prefix) {
       const specsEl = document.getElementById(`${prefix}-specs`);
       if (!specsEl) return;
-      try {
-        const res = await fetch("/api/machine-info");
-        const s = await res.json();
-        if (!s) { specsEl.innerHTML = ""; return; }
-
-        let linhas = [];
+      const s = specsLocal;
+      let linhas = [];
+      if (s) {
         const modelo = [s.manufacturer, s.model].filter(Boolean).join(" ");
         if (modelo) linhas.push(`Modelo: <strong>${modelo}</strong>`);
         if (s.cpu) linhas.push(`Processador: ${s.cpu}`);
         if (s.ram_gb) linhas.push(`Memória RAM: ${s.ram_gb} GB`);
+      }
+      const disco = formatarDisco(healthLocal);
+      if (disco) linhas.push(disco);
+      if (s) {
         if (s.os_caption) linhas.push(`Sistema operacional: ${s.os_caption}${s.os_version ? ` <span style="color: var(--text-muted);">(build ${s.os_version})</span>` : ""}`);
         if (s.serial) linhas.push(`Número de série: ${s.serial}`);
-        specsEl.innerHTML = linhas.join("<br>");
-      } catch (e) {
-        specsEl.innerHTML = "";
       }
+      specsEl.innerHTML = linhas.join("<br>");
+    }
+
+    async function loadMachineSpecsInto(prefix) {
+      try {
+        const res = await fetch("/api/machine-info");
+        specsLocal = await res.json();
+      } catch (e) {
+        specsLocal = null;
+      }
+      renderSpecsLocal(prefix);
     }
 
     async function checkUpdateVersionBadge(prefix) {
@@ -1240,7 +1257,11 @@
       const health = await fetchLocalHealth();
       const dashDetails = document.getElementById("dash-details");
       if (dashDetails) {
-        dashDetails.innerHTML = health ? buildMachineDetailsHtml(health, { skipQueueAndStats: true }) : "Não foi possível consultar o serviço local.";
+        dashDetails.innerHTML = health ? buildMachineDetailsHtml(health, { skipQueueAndStats: true, skipDisk: true }) : "Não foi possível consultar o serviço local.";
+      }
+      if (health) {
+        healthLocal = health;
+        renderSpecsLocal("dash");
       }
       if (health) {
         updateMachineCardPhoto("dash", health);

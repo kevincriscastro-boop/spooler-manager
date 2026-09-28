@@ -129,3 +129,30 @@ def test_card_mostra_hardware_em_cima_e_disco_nao_repete_embaixo(pagina):
         assert campo in topo, campo
     assert "Disco livre" not in baixo
     assert "Impressora(s)" in baixo  # o que muda o tempo todo continua embaixo
+
+
+@pytest.mark.parametrize("logado,prefixo", [(False, "home"), (True, "dash")])
+def test_tela_inicial_e_este_computador_mesmo_layout(logado, prefixo):
+    # Tela inicial (sem login) e aba "Este Computador": hardware + disco em cima.
+    with playwright.sync_playwright() as p:
+        try:
+            browser = p.chromium.launch()
+        except Exception as e:
+            pytest.skip(f"Chromium indisponivel: {e}")
+        ctx = browser.new_context()
+        ctx.route("**/*", painel.responder)
+        if logado:
+            ctx.add_init_script("localStorage.setItem('spooler_token', 'token-exemplo');")
+        page = ctx.new_page()
+        erros = []
+        page.on("pageerror", lambda e: erros.append(str(e)))
+        page.goto(painel.BASE + "/")
+        page.wait_for_selector(f"#{prefixo}-specs >> text=Disco livre", timeout=15000)
+        topo, baixo = page.inner_text(f"#{prefixo}-specs"), page.inner_text(f"#{prefixo}-details")
+        for campo in ("Modelo: Dell OptiPlex 7050", "Processador: Intel Core i5-7500", "Memória RAM: 16 GB",
+                      "Disco livre: 182.4 GB de 237.9 GB", "Sistema operacional: Microsoft Windows 11 Pro"):
+            assert campo in topo, campo
+        assert "Disco livre" not in baixo
+        assert "Impressora(s)" in baixo
+        assert erros == []
+        browser.close()

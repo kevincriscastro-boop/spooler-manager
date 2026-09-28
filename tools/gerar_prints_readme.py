@@ -84,6 +84,7 @@ def machine_info(host):
         "manufacturer": modelo[0],
         "model": modelo[1].replace("_", " "),
         "serial": "EXEMPLO" + host[-2:],
+        "cpu": {"NB-VENDAS03": "Intel Core i5-1135G7 @ 2.40GHz", "PC-RECEPCAO01": "Intel Core i5-4590 @ 3.30GHz"}.get(host, "Intel Core i5-7500 @ 3.40GHz"),
         "os_caption": "Microsoft Windows 11 Pro",
         "os_version": "10.0.26100",
         "ram_gb": 16,

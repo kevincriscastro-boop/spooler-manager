@@ -135,13 +135,27 @@ function Get-MachineSpecs {
 
         $modeloFinal = if ($pareceValorReal) { $modelComercial } else { $cs.Model }
 
+        # Processador, sem as marcas registradas: "Intel(R) Core(TM) i5-7500 CPU
+        # @ 3.40GHz" -> "Intel Core i5-7500 @ 3.40GHz".
+        $cpuInfo = Get-CimInstance Win32_Processor -OperationTimeoutSec 5 -ErrorAction SilentlyContinue | Select-Object -First 1
+        $cpu = if ($cpuInfo -and $cpuInfo.Name) {
+            (($cpuInfo.Name -replace '\((R|TM)\)', '' -replace '\bCPU\b', '') -replace '\s+', ' ').Trim()
+        } else { $null }
+
+        # RAM instalada (soma dos pentes) - TotalPhysicalMemory e a memoria
+        # utilizavel (ex: 15,8 GB numa maquina de 16 GB); fica de reserva.
+        $pentes = @(Get-CimInstance Win32_PhysicalMemory -OperationTimeoutSec 5 -ErrorAction SilentlyContinue)
+        $ramInstalada = ($pentes | Measure-Object -Property Capacity -Sum).Sum
+        $ramGb = if ($ramInstalada) { [Math]::Round($ramInstalada / 1GB) } else { [Math]::Round($cs.TotalPhysicalMemory / 1GB, 1) }
+
         $global:cachedMachineSpecs = [PSCustomObject]@{
             manufacturer = $cs.Manufacturer
             model        = $modeloFinal
+            cpu          = $cpu
             serial       = if ($bios) { $bios.SerialNumber } else { $null }
             os_caption   = if ($os) { $os.Caption } else { $null }
             os_version   = if ($os) { $os.Version } else { $null }
-            ram_gb       = [Math]::Round($cs.TotalPhysicalMemory / 1GB, 1)
+            ram_gb       = $ramGb
         }
     } catch {
         $global:cachedMachineSpecs = $null

@@ -118,3 +118,14 @@ def test_configuracoes_nesta_maquina_e_na_frota(pagina):
     assert "✗ Estoque (PC-ESTOQUE04): offline" in resultado
     remotos = {e["host"] for e in painel.ENVIOS if e["path"] == "/api/settings"}
     assert {"PC-ADMIN01", "PC-RECEPCAO01", "PC-FINANCEIRO02"} <= remotos
+
+
+def test_card_mostra_hardware_em_cima_e_disco_nao_repete_embaixo(pagina):
+    abrir_frota(pagina)
+    pagina.wait_for_selector("#specs-a2 >> text=Disco livre")
+    topo, baixo = pagina.inner_text("#specs-a2"), pagina.inner_text("#details-a2")
+    for campo in ("Modelo: Dell OptiPlex 7050", "Processador: Intel Core i5-7500", "Memória RAM: 16 GB",
+                  "Disco livre: 21.7 GB de 237.9 GB", "SO: Microsoft Windows 11 Pro"):
+        assert campo in topo, campo
+    assert "Disco livre" not in baixo
+    assert "Impressora(s)" in baixo  # o que muda o tempo todo continua embaixo

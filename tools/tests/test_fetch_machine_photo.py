@@ -116,6 +116,8 @@ def test_powershell_resolve_photo_path(tmp_path):
         "Resolve-PhotoPath -FileName 'PC-COM-FOTO.png'",  # foto propria tem prioridade
         "$env:COMPUTERNAME = 'PC-ESTA'",
         "Resolve-PhotoPath -FileName 'OUTRA-MAQUINA.png'",  # outra maquina -> nao usa o modelo desta
+        # Nome com mais de 15 caracteres: COMPUTERNAME vem cortado, a Frota pede pelo completo.
+        "Resolve-PhotoPath -FileName 'pc-financeiro-matriz.png' -NomesDestaMaquina 'PC-FINANCEIRO-M','PC-FINANCEIRO-MATRIZ'",
     ])
     saida = subprocess.run(["powershell", "-NoProfile", "-Command", script],
                            capture_output=True, text=True, check=True).stdout.splitlines()
@@ -123,4 +125,5 @@ def test_powershell_resolve_photo_path(tmp_path):
         str(tmp_path / "photos-by-model" / "Dell_OptiPlex_7050.png"),
         str(tmp_path / "photos" / "PC-COM-FOTO.png"),
         str(tmp_path / "photos" / "OUTRA-MAQUINA.png"),
+        str(tmp_path / "photos-by-model" / "Dell_OptiPlex_7050.png"),
     ]

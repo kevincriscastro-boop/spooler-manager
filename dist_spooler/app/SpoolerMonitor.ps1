@@ -216,12 +216,19 @@ function Get-ModelPhotoKey {
 # existir; senao, quando o pedido e a foto DESTA maquina, a foto do modelo
 # dela na biblioteca photos-by-model. Coberto por teste em
 # tools/tests/test_fetch_machine_photo.py.
+#
+# "Esta maquina" aceita os dois nomes: $env:COMPUTERNAME e o nome NetBIOS,
+# cortado em 15 caracteres (ex: PC-FINANCEIRO-MATRIZ vira PC-FINANCEIRO-M),
+# enquanto a Frota chama a maquina pelo nome completo (DNS).
 function Resolve-PhotoPath {
-    param([string]$FileName)
+    param(
+        [string]$FileName,
+        [string[]]$NomesDestaMaquina = @($env:COMPUTERNAME, [System.Net.Dns]::GetHostName())
+    )
     if (-not $FileName) { return $null }
     $fotoPropria = Join-Path $AppDir "photos\$FileName"
     if (Test-Path $fotoPropria) { return $fotoPropria }
-    if ([System.IO.Path]::GetFileNameWithoutExtension($FileName) -ne $env:COMPUTERNAME) { return $fotoPropria }
+    if ($NomesDestaMaquina -notcontains [System.IO.Path]::GetFileNameWithoutExtension($FileName)) { return $fotoPropria }
     $specs = Get-MachineSpecs
     if (-not ($specs -and $specs.manufacturer -and $specs.model)) { return $fotoPropria }
     $chaveModelo = Get-ModelPhotoKey -Manufacturer $specs.manufacturer -Model $specs.model

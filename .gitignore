@@ -33,3 +33,6 @@ tools/**/__pycache__/
 # Fotos por hostname identificam maquinas reais - ficam no repositorio de
 # dados privado (ver tools/fetch_machine_photo.py e o deploy.yml)
 dist_spooler/app/photos/
+
+# Configuracoes locais do editor
+.vscode/

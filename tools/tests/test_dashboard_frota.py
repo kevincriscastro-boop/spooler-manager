@@ -74,7 +74,8 @@ def test_filtros_da_frota(pagina):
 
     pagina.select_option("#filtro-situacao", "")
     pagina.select_option("#filtro-modelo", "Dell OptiPlex 7050")
-    assert visiveis(pagina) == ["machine-a2"]
+    # A2 online + A4 offline (modelo vem da ultima leitura guardada no monitor).
+    assert visiveis(pagina) == ["machine-a2", "machine-a4"]
 
     pagina.select_option("#filtro-modelo", "")
     pagina.fill("#filtro-busca", "vendas")
@@ -156,3 +157,18 @@ def test_tela_inicial_e_este_computador_mesmo_layout(logado, prefixo):
         assert "Impressora(s)" in baixo
         assert erros == []
         browser.close()
+
+
+def test_anydesk_disponivel_com_maquina_offline(pagina):
+    # "Estoque" (PC-ESTOQUE04) esta offline; a ultima leitura guardada no monitor tem o ID.
+    painel.MAQUINAS[3]["last_health"] = {"hostname": "PC-ESTOQUE04", "anydesk_id": "987654321",
+                                         "printers": [], "version": painel.VERSAO}
+    painel.MAQUINAS[3]["last_seen"] = "2026-09-20T10:00:00"
+    abrir_frota(pagina)
+    botao = pagina.locator("#anydesk-btn-a4 button")
+    assert botao.is_visible()
+    assert "Acessar via AnyDesk" in botao.inner_text()
+    assert "987654321" in botao.get_attribute("onclick")
+    assert pagina.locator("#anydesk-btn-a4 svg.anydesk-icon").count() == 1
+    # Maquinas online tambem tem o botao (ID vindo do /api/health).
+    assert pagina.locator("#anydesk-btn-a1 button").is_visible()

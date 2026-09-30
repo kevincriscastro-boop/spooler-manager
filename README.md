@@ -92,6 +92,16 @@ Tudo roda em **PowerShell puro**, sem nada para instalar além do próprio pacot
 3. Abra o atalho **Painel Admin - Spooler** na Área de Trabalho. O login inicial é
    `admin` / `admin`.
 
+Com um servidor de atualização configurado (veja abaixo), dá para instalar com **um
+comando só**, num PowerShell comum. Ele pede o UAC sozinho:
+
+```powershell
+irm http://seu-servidor:8990/install.ps1 | iex
+```
+
+O `install.ps1` é gerado pelo deploy a partir de [`deploy/install.ps1`](deploy/install.ps1),
+já com o endereço do servidor.
+
 > ⚠️ **Troque a senha padrão** pelo botão **Trocar Senha** do painel. Todas as
 > máquinas de uma mesma Frota precisam usar a mesma senha.
 

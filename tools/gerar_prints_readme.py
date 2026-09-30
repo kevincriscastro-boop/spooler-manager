@@ -35,7 +35,14 @@ MAQUINAS = [
     {"id": "a1", "name": "Recepção", "host": "PC-RECEPCAO01"},
     {"id": "a2", "name": "Financeiro", "host": "PC-FINANCEIRO02"},
     {"id": "a3", "name": "Vendas - Notebook", "host": "NB-VENDAS03"},
-    {"id": "a4", "name": "Estoque", "host": "PC-ESTOQUE04"},
+    # Offline, mas com a ultima leitura guardada no monitor (mostra specs e o botao do AnyDesk).
+    {"id": "a4", "name": "Estoque", "host": "PC-ESTOQUE04",
+     "last_specs": {"manufacturer": "Dell Inc.", "model": "OptiPlex 7050", "cpu": "Intel Core i5-6500 @ 3.20GHz",
+                    "ram_gb": 8, "serial": "EXEMPLO04", "os_caption": "Microsoft Windows 10 Pro"},
+     "last_health": {"hostname": "PC-ESTOQUE04", "anydesk_id": "123456789", "printers": ["Etiquetas Expedição"],
+                     "current_queue": 0, "version": "2026.09.28.4", "disk_free_gb": 64.3, "disk_total_gb": 237.9,
+                     "_checadoEm": "27/09/26, 17:42"},
+     "last_seen": "2026-09-27T17:42:00"},
 ]
 
 # Estado da API simulada, que os testes de navegador (tools/tests/test_dashboard_*.py)

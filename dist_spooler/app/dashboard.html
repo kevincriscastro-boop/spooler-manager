@@ -147,6 +147,18 @@
       transform: translateY(-1px);
     }
 
+    /* Botao do AnyDesk nas cores da marca */
+    .btn-anydesk {
+      background: #ef443b;
+      color: #fff;
+      border: 1px solid #ef443b;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-anydesk:hover { background: #d8352c; border-color: #d8352c; }
+    .anydesk-icon { width: 15px; height: 15px; flex: 0 0 auto; }
+
     .btn-action-force {
       background: linear-gradient(135deg, #f59e0b, #ef4444);
       color: #fff;
@@ -1609,6 +1621,7 @@
           </div>
         `;
         grid.appendChild(card);
+        renderAnyDeskButton(m.id); // da ultima leitura: aparece mesmo com a maquina offline
         loadMachineSpecsRemote(m.id, m.host);
       });
 
@@ -1642,7 +1655,7 @@
     function buildSpecsHtml(s, h) {
       let linhas = [];
       if (s) {
-        const modelo = [s.manufacturer, s.model].filter(Boolean).join(" ");
+        const modelo = nomeModelo(s); // sem "Inc." etc., igual ao filtro
         if (modelo) linhas.push(`Modelo: <strong>${modelo}</strong>`);
         if (s.cpu) linhas.push(`Processador: ${s.cpu}`);
         if (s.ram_gb) linhas.push(`Memória RAM: ${s.ram_gb} GB`);
@@ -1744,10 +1757,7 @@
         details.innerHTML = buildMachineDetailsHtml(health, { skipDisk: true });
         atualizarSpecsDoCard(m.id);
 
-        const anydeskSlot = document.getElementById(`anydesk-btn-${m.id}`);
-        if (anydeskSlot && health.anydesk_id) {
-          anydeskSlot.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="connectAnyDesk('${health.anydesk_id}')">🖥️ Acessar via AnyDesk</button>`;
-        }
+        renderAnyDeskButton(m.id);
       });
     }
 
@@ -1757,6 +1767,21 @@
       if (!pass) return null;
       fleetPassHash = await sha256(pass);
       return fleetPassHash;
+    }
+
+    // Botao do AnyDesk a partir da ultima leitura guardada (o ID nao muda):
+    // continua disponivel com a maquina offline no Spooler Manager - ex: o
+    // monitor caiu ou o Wi-Fi esta ruim, mas o AnyDesk ainda alcanca a maquina.
+    function renderAnyDeskButton(id) {
+      const slot = document.getElementById(`anydesk-btn-${id}`);
+      const h = lastHealthCache[id];
+      if (!slot || !h || !h.anydesk_id) return;
+      const anydeskId = String(h.anydesk_id).replace(/[^0-9a-zA-Z@._-]/g, "");
+      if (slot.dataset.anydeskId === anydeskId) return;
+      slot.dataset.anydeskId = anydeskId;
+      slot.innerHTML = `<button class="btn btn-sm btn-anydesk" title="AnyDesk ${anydeskId}" onclick="connectAnyDesk('${anydeskId}')">` +
+        `<svg class="anydesk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 20.8 12 12 20.8 3.2 12Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 8.6 15.4 12 12 15.4 8.6 12Z" fill="currentColor"/></svg>` +
+        `Acessar via AnyDesk</button>`;
     }
 
     function connectAnyDesk(anydeskId) {

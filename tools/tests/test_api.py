@@ -284,3 +284,26 @@ def test_settings_devolve_configuracao_valida():
                          json={"stuck_threshold_minutes": 999})
     assert ruim.status_code == 400
     assert requests.get(f"{LOCAL_BASE_URL}/api/settings", timeout=TIMEOUT, headers=auth).json() == cfg
+
+
+# --------------------------------------------------------------------------
+# Instalador de um comando (install.ps1): gerado pelo deploy a partir do modelo
+# --------------------------------------------------------------------------
+
+def test_modelo_do_install_ps1():
+    modelo = (REPO_ROOT / "deploy" / "install.ps1").read_text(encoding="utf-8")
+    assert "__UPDATE_BASE_URL__" in modelo  # o deploy troca pelo endereco real
+    codigo = "\n".join(l for l in modelo.splitlines() if not l.strip().startswith("#"))
+    assert not re.search(r"Start-Process[^\n]*-Wait\b", codigo)  # travava no explorer.exe
+    assert "WaitForExit(" in codigo
+    assert '$ProgressPreference = "SilentlyContinue"' in codigo
+
+
+@pytest.mark.vps
+@requires_vps_url
+def test_install_ps1_publicado():
+    resp = requests.get(f"{VPS_BASE_URL}/install.ps1", timeout=TIMEOUT)
+    assert resp.status_code == 200
+    texto = resp.content.decode("utf-8-sig")
+    assert "__UPDATE_BASE_URL__" not in texto
+    assert VPS_BASE_URL in texto

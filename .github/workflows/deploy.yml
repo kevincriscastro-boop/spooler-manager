@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - "dist_spooler/**"
+      - "deploy/**"
   workflow_dispatch: {}
 
 # Enderecos do ambiente real vem dos secrets do repositorio (Settings >
@@ -96,10 +97,21 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Publicar zip e VERSION na VPS
+      # Instalador de um comando (irm <servidor>/install.ps1 | iex): gerado a
+      # partir do modelo deploy/install.ps1 com o endereco real.
+      - name: Gerar install.ps1
+        run: |
+          sed "s|__UPDATE_BASE_URL__|$UPDATE_BASE_URL|" deploy/install.ps1 > install.ps1
+          if grep -q "__UPDATE_BASE_URL__" install.ps1; then echo "ERRO: install.ps1 sem endereco"; exit 1; fi
+
+      # VERSION por ultimo: as maquinas so enxergam a versao nova quando o
+      # pacote (e o instalador) ja estao no lugar.
+      - name: Publicar zip, install.ps1 e VERSION na VPS
         run: |
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
             dist_spooler.zip "$VPS_USER@$VPS_HOST:$VPS_PATH/dist_spooler.zip"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            install.ps1 "$VPS_USER@$VPS_HOST:$VPS_PATH/install.ps1"
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
             dist_spooler/VERSION "$VPS_USER@$VPS_HOST:$VPS_PATH/VERSION"
 

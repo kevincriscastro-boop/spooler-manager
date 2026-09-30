@@ -21,6 +21,16 @@ SPECS_GUARDADAS = {"a4": {"manufacturer": "Dell Inc.", "model": "OptiPlex 3020",
 
 
 def test_maquina_offline_mantem_specs_e_foto_do_modelo():
+    # So o cache do navegador neste teste: tira a leitura guardada no monitor simulado.
+    maquina = painel.MAQUINAS[3]
+    guardado = {k: maquina.pop(k) for k in ("last_specs", "last_health", "last_seen") if k in maquina}
+    try:
+        _verificar_offline()
+    finally:
+        maquina.update(guardado)
+
+
+def _verificar_offline():
     with playwright.sync_playwright() as p:
         try:
             browser = p.chromium.launch()

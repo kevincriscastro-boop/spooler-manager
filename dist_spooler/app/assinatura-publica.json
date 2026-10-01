@@ -1,0 +1,6 @@
+﻿{
+    "observacao":  "Chaves PUBLICAS de verificacao dos pacotes (a primeira e a atual). Geradas por gerar-chave-assinatura.ps1 no repositorio de dados.",
+    "chaves":  [
+                   "\u003cRSAKeyValue\u003e\u003cModulus\u003esnM0lOHO64QoQ4iqt19hvIxDLmTJLk179rhVPkM4aRSnFBwdqa0AVdinkHufpWs7uTz9H7YVj0ld1yxRvmMHcIfnxmZdTaO3BGmuhr43cgKD5TgjNqxpqcMuVfFpjmvZfc+wVfHDPVyJigejfhd5iS0+T5ucTc2RumAB2xm83PNE3HZaMpeP0sFQOakZykbG+0xURpVsn/hNj5VJGC1/ZxczZbFEUazBe1F8Zk62yLtx7YqlbUgTtblO8p3pia+wrwou9UoahffHjfn93eIU5Juc/3Aqi/D8zqI0C4vWI4Ly+uVryCvx9cKp35d6Xe6d4ArHqlPSfO+7mjqoJNCLqGEzLVOZ+k1xnR0EVmyY0On47sSsjJkkds3hS3v8W4ZAyC9aS1Peh6t4m520TzqnQ8+AeAuAm/vvsheoLgk4mJH6dCrcN6VONBE62OI9SoKevjVhcMLfAyn5IzA6/hNqFglcuOJz8szrywBY1S0lGOMQwWHhZipRYyK0NZ5gg8Jh\u003c/Modulus\u003e\u003cExponent\u003eAQAB\u003c/Exponent\u003e\u003c/RSAKeyValue\u003e"
+               ]
+}

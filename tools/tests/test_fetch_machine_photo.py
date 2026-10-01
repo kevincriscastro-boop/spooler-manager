@@ -99,6 +99,47 @@ def test_fila_snapshot_nao_trava_com_spooler_preso():
     ]
 
 
+def _funcao_do_atualizador(nome):
+    texto = (Path(__file__).resolve().parents[2] / "dist_spooler" / "app" / "AtualizarAgora.ps1").read_text(encoding="utf-8-sig")
+    return re.search(rf"^function {nome}\b.*?^\}}", texto, re.S | re.M).group(0)
+
+
+@pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
+def test_assinatura_do_pacote(tmp_path):
+    # Chaves descartaveis, so deste teste. Assina como o deploy (RSA + SHA-256,
+    # PKCS#1 v1.5) e verifica com a funcao real do AtualizarAgora.ps1.
+    t = str(tmp_path).replace("'", "''")
+    script = "\n".join([
+        _funcao_do_atualizador("Test-AssinaturaPacote"),
+        f"$d = '{t}'",
+        "function NovaChave { $r = New-Object System.Security.Cryptography.RSACryptoServiceProvider(2048); $r.PersistKeyInCsp = $false; $r }",
+        "$boa = NovaChave; $outra = NovaChave",
+        "[IO.File]::WriteAllBytes(\"$d\\pacote.zip\", [Text.Encoding]::UTF8.GetBytes('pacote de teste ' * 200))",
+        "[IO.File]::WriteAllBytes(\"$d\\pacote.zip.sig\", $boa.SignData([IO.File]::ReadAllBytes(\"$d\\pacote.zip\"), 'SHA256'))",
+        "function Chaves($lista) { @{ chaves = $lista } | ConvertTo-Json | Set-Content \"$d\\chaves.json\" -Encoding UTF8 }",
+        "Chaves @($boa.ToXmlString($false))",
+        "'correto: ' + (Test-AssinaturaPacote \"$d\\pacote.zip\" \"$d\\pacote.zip.sig\" \"$d\\chaves.json\")",
+        "$b = [IO.File]::ReadAllBytes(\"$d\\pacote.zip\"); $b[50] = $b[50] -bxor 1; [IO.File]::WriteAllBytes(\"$d\\alterado.zip\", $b)",
+        "'alterado: ' + (Test-AssinaturaPacote \"$d\\alterado.zip\" \"$d\\pacote.zip.sig\" \"$d\\chaves.json\")",
+        "'sem assinatura: ' + (Test-AssinaturaPacote \"$d\\pacote.zip\" \"$d\\nao-existe.sig\" \"$d\\chaves.json\")",
+        "'sem chaves: ' + (Test-AssinaturaPacote \"$d\\pacote.zip\" \"$d\\pacote.zip.sig\" \"$d\\nao-existe.json\")",
+        "Chaves @($outra.ToXmlString($false))",
+        "'outra chave: ' + (Test-AssinaturaPacote \"$d\\pacote.zip\" \"$d\\pacote.zip.sig\" \"$d\\chaves.json\")",
+        "Chaves @($outra.ToXmlString($false), $boa.ToXmlString($false))",
+        "'troca de chave: ' + (Test-AssinaturaPacote \"$d\\pacote.zip\" \"$d\\pacote.zip.sig\" \"$d\\chaves.json\")",
+    ])
+    saida = subprocess.run(["powershell", "-NoProfile", "-Command", script],
+                           capture_output=True, text=True, check=True, timeout=90).stdout.splitlines()
+    assert saida == [
+        "correto: OK",
+        "alterado: INVALIDA",
+        "sem assinatura: SEM_ASSINATURA",
+        "sem chaves: SEM_CHAVES",
+        "outra chave: INVALIDA",
+        "troca de chave: OK",
+    ]
+
+
 @pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
 def test_configuracoes_do_monitor():
     # Get-JsonData/Save-JsonData simulados em memoria (sem tocar no data.json real).

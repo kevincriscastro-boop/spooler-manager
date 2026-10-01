@@ -21,6 +21,8 @@ import json
 import os
 import pathlib
 import re
+import shutil
+import subprocess
 import zipfile
 
 import pytest
@@ -307,3 +309,52 @@ def test_install_ps1_publicado():
     texto = resp.content.decode("utf-8-sig")
     assert "__UPDATE_BASE_URL__" not in texto
     assert VPS_BASE_URL in texto
+
+
+# --------------------------------------------------------------------------
+# Assinatura dos pacotes: o AtualizarAgora so instala pacote assinado pelo
+# deploy, conferindo com as chaves publicas de assinatura-publica.json.
+# --------------------------------------------------------------------------
+
+ARQUIVO_CHAVES = REPO_ROOT / "dist_spooler" / "app" / "assinatura-publica.json"
+
+
+def test_chaves_publicas_de_assinatura():
+    assert ARQUIVO_CHAVES.exists(), "rode gerar-chave-assinatura.ps1 (repositorio de dados)"
+    chaves = json.loads(ARQUIVO_CHAVES.read_text(encoding="utf-8-sig"))["chaves"]
+    assert chaves, "nenhuma chave publica"
+    for chave in chaves:
+        assert "<Modulus>" in chave and "<Exponent>" in chave
+        # Nunca uma chave PRIVADA no repositorio publico.
+        for privado in ("<D>", "<P>", "<Q>", "<DP>", "<DQ>", "<InverseQ>"):
+            assert privado not in chave, f"chave privada ({privado}) no arquivo de chaves publicas!"
+
+
+def test_installer_copies_signing_keys_on_update():
+    # Sem as chaves, o AtualizarAgora novo recusa todo pacote e a maquina trava.
+    bat = (REPO_ROOT / "dist_spooler" / "Instalar.bat").read_text(encoding="utf-8-sig")
+    ramo_atualizacao = bat.split('if exist "%TARGET_DIR%\data.json" (', 1)[1].split(") else (", 1)[0]
+    assert r'copy /y "app\assinatura-publica.json"' in ramo_atualizacao
+
+
+def test_atualizador_recusa_pacote_sem_assinatura_valida_e_versao_antiga():
+    codigo = (REPO_ROOT / "dist_spooler" / "app" / "AtualizarAgora.ps1").read_text(encoding="utf-8-sig")
+    # A verificacao acontece ANTES de extrair/instalar, e falha fechada.
+    assert codigo.index("Test-AssinaturaPacote -Arquivo") < codigo.index("Expand-Archive -Path $zipPath")
+    assert 'if ($verificacao -ne "OK")' in codigo
+    assert "[version]$versaoNova -lt [version]$versaoAntes" in codigo
+
+
+@pytest.mark.vps
+@requires_vps_url
+@pytest.mark.skipif(shutil.which("powershell") is None, reason="precisa do Windows PowerShell")
+def test_pacote_publicado_tem_assinatura_valida(tmp_path):
+    for nome in ("dist_spooler.zip", "dist_spooler.zip.sig"):
+        resp = requests.get(f"{VPS_BASE_URL}/{nome}", timeout=30)
+        assert resp.status_code == 200, f"{nome} nao publicado"
+        (tmp_path / nome).write_bytes(resp.content)
+    atualizador = (REPO_ROOT / "dist_spooler" / "app" / "AtualizarAgora.ps1").read_text(encoding="utf-8-sig")
+    funcao = re.search(r"^function Test-AssinaturaPacote\b.*?^\}", atualizador, re.S | re.M).group(0)
+    script = funcao + f"\nTest-AssinaturaPacote '{tmp_path}\dist_spooler.zip' '{tmp_path}\dist_spooler.zip.sig' '{ARQUIVO_CHAVES}'"
+    saida = subprocess.run(["powershell", "-NoProfile", "-Command", script], capture_output=True, text=True, timeout=60).stdout.strip()
+    assert saida == "OK", f"assinatura do pacote publicado: {saida}"

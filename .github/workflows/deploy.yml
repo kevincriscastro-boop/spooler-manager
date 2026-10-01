@@ -32,10 +32,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Conferir secrets
+        env:
+          TEM_CHAVE_ASSINATURA: ${{ secrets.UPDATE_SIGNING_KEY != '' }}
         run: |
           for v in VPS_HOST VPS_PATH UPDATE_BASE_URL; do
             if [ -z "${!v}" ]; then echo "ERRO: secret $v nao configurado"; exit 1; fi
           done
+          if [ "$TEM_CHAVE_ASSINATURA" != "true" ]; then echo "ERRO: secret UPDATE_SIGNING_KEY nao configurado"; exit 1; fi
 
       # Nao publica nada se o codigo tiver IP/termo do ambiente real (mesma
       # checagem do workflow "Checagem de dados sensiveis").
@@ -90,6 +93,31 @@ jobs:
           print("OK - todos os .bat do zip com CRLF")
           PYEOF
 
+      # Assina o pacote (RSA + SHA-256). As maquinas so instalam se a
+      # assinatura conferir com uma chave de dist_spooler/app/assinatura-publica.json.
+      # Antes de publicar, confere a propria assinatura com essas chaves: se a
+      # chave do secret nao for a do arquivo, as maquinas recusariam tudo.
+      - name: Assinar pacote
+        shell: pwsh
+        env:
+          CHAVE_PRIVADA: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: |
+          $rsa = [System.Security.Cryptography.RSA]::Create()
+          $rsa.FromXmlString($env:CHAVE_PRIVADA)
+          $dados = [IO.File]::ReadAllBytes("dist_spooler.zip")
+          $sha = [System.Security.Cryptography.HashAlgorithmName]::SHA256
+          $pkcs1 = [System.Security.Cryptography.RSASignaturePadding]::Pkcs1
+          $assinatura = $rsa.SignData($dados, $sha, $pkcs1)
+          [IO.File]::WriteAllBytes("dist_spooler.zip.sig", $assinatura)
+          $publicas = (Get-Content dist_spooler/app/assinatura-publica.json -Raw | ConvertFrom-Json).chaves
+          $ok = $false
+          foreach ($p in $publicas) {
+            $v = [System.Security.Cryptography.RSA]::Create(); $v.FromXmlString($p)
+            if ($v.VerifyData($dados, $assinatura, $sha, $pkcs1)) { $ok = $true }
+          }
+          if (-not $ok) { Write-Error "ERRO: a chave UPDATE_SIGNING_KEY nao corresponde a nenhuma chave de assinatura-publica.json"; exit 1 }
+          Write-Host "OK - pacote assinado e conferido com a chave publica do repositorio"
+
       - name: Configurar chave SSH de deploy
         run: |
           mkdir -p ~/.ssh
@@ -110,6 +138,8 @@ jobs:
         run: |
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
             dist_spooler.zip "$VPS_USER@$VPS_HOST:$VPS_PATH/dist_spooler.zip"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            dist_spooler.zip.sig "$VPS_USER@$VPS_HOST:$VPS_PATH/dist_spooler.zip.sig"
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
             install.ps1 "$VPS_USER@$VPS_HOST:$VPS_PATH/install.ps1"
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \

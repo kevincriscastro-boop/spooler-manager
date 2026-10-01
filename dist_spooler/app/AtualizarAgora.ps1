@@ -49,20 +49,65 @@ if (-not $UpdateBaseUrl) {
 $versaoAntes = try { (Get-Content (Join-Path $PSScriptRoot "VERSION") -Raw).Trim() } catch { "?" }
 Write-UpdateLog "Inicio (versao instalada: $versaoAntes, usuario: $env:USERNAME)"
 
+# Verifica se o pacote foi assinado com a chave privada do deploy (secret
+# UPDATE_SIGNING_KEY no GitHub), conferindo contra as chaves PUBLICAS de
+# assinatura-publica.json. Este script roda como SYSTEM e o pacote vem por
+# HTTP: sem isso, quem se colocasse entre a maquina e o servidor poderia
+# trocar o zip e executar qualquer coisa na Frota inteira.
+# Devolve "OK", "SEM_CHAVES", "SEM_ASSINATURA" ou "INVALIDA".
+function Test-AssinaturaPacote {
+    param([string]$Arquivo, [string]$ArquivoAssinatura, [string]$ArquivoChaves)
+    if (-not (Test-Path $ArquivoChaves)) { return "SEM_CHAVES" }
+    if (-not (Test-Path $ArquivoAssinatura)) { return "SEM_ASSINATURA" }
+    $chaves = @((Get-Content $ArquivoChaves -Raw -Encoding UTF8 | ConvertFrom-Json).chaves | Where-Object { $_ })
+    if (-not $chaves.Count) { return "SEM_CHAVES" }
+    $dados = [IO.File]::ReadAllBytes($Arquivo)
+    $assinatura = [IO.File]::ReadAllBytes($ArquivoAssinatura)
+    foreach ($chave in $chaves) {
+        $rsa = New-Object System.Security.Cryptography.RSACryptoServiceProvider
+        try {
+            $rsa.PersistKeyInCsp = $false
+            $rsa.FromXmlString($chave)
+            if ($rsa.VerifyData($dados, "SHA256", $assinatura)) { return "OK" }
+        } catch {} finally { $rsa.Clear() }
+    }
+    return "INVALIDA"
+}
+
 try {
     $zipPath = "$env:TEMP\dist_spooler_update_$PID.zip"
     Invoke-WebRequest -Uri "$UpdateBaseUrl/dist_spooler.zip" -OutFile $zipPath -UseBasicParsing -TimeoutSec 120
     Write-UpdateLog "Download ok ($([Math]::Round((Get-Item $zipPath).Length / 1KB)) KB)"
+
+    $sigPath = "$zipPath.sig"
+    try { Invoke-WebRequest -Uri "$UpdateBaseUrl/dist_spooler.zip.sig" -OutFile $sigPath -UseBasicParsing -TimeoutSec 60 } catch {}
+    $verificacao = Test-AssinaturaPacote -Arquivo $zipPath -ArquivoAssinatura $sigPath -ArquivoChaves (Join-Path $PSScriptRoot "assinatura-publica.json")
+    Remove-Item $sigPath -Force -ErrorAction SilentlyContinue
+    if ($verificacao -ne "OK") {
+        # Falha FECHADA: na duvida, nao instala nada.
+        Write-UpdateLog "ERRO: pacote recusado - assinatura $verificacao (nada foi instalado)"
+        Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
+        return
+    }
+    Write-UpdateLog "Assinatura do pacote OK"
 
     $extractPath = "$env:TEMP\dist_spooler_update_$PID"
     if (Test-Path $extractPath) { Remove-Item $extractPath -Recurse -Force }
     Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
 
     $installerPath = Join-Path $extractPath "Instalar.bat"
+    $versaoNova = try { (Get-Content (Join-Path $extractPath "VERSION") -Raw).Trim() } catch { "?" }
+    # Nao volta para uma versao mais antiga (um pacote antigo, ainda que
+    # assinado, poderia reinstalar um defeito ja corrigido). Mesma versao pode:
+    # e o "Forcar Atualizacao" reinstalando.
+    $maisAntiga = $false
+    try { $maisAntiga = [version]$versaoNova -lt [version]$versaoAntes } catch {}
+
     if (-not (Test-Path $installerPath)) {
         Write-UpdateLog "ERRO: Instalar.bat nao encontrado dentro do zip"
+    } elseif ($maisAntiga) {
+        Write-UpdateLog "ERRO: pacote recusado - versao $versaoNova e mais antiga que a instalada ($versaoAntes)"
     } else {
-        $versaoNova = try { (Get-Content (Join-Path $extractPath "VERSION") -Raw).Trim() } catch { "?" }
         Write-UpdateLog "Rodando instalador da versao $versaoNova"
 
         # Quem chama este script ja roda elevado (SYSTEM no vigia, ou o

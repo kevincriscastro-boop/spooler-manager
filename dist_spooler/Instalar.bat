@@ -48,6 +48,9 @@ if exist "%TARGET_DIR%\data.json" (
     rem lista - sem ele o vigia para de achar a VPS e a maquina nunca mais
     rem atualiza sozinha. Coberto por teste em tools/tests/test_api.py.
     if exist "app\config.json" copy /y "app\config.json" "%TARGET_DIR%\" >nul
+    rem Chaves publicas de verificacao dos pacotes - sem elas o AtualizarAgora
+    rem recusa todo pacote e a maquina para de atualizar. Coberto por teste.
+    copy /y "app\assinatura-publica.json" "%TARGET_DIR%\" >nul
     copy /y "app\LimparSpoolerCore.ps1" "%TARGET_DIR%\" >nul
     copy /y "app\dashboard.html" "%TARGET_DIR%\" >nul
     copy /y "app\SpoolerMonitor.ps1" "%TARGET_DIR%\" >nul

@@ -15,6 +15,8 @@ $ErrorActionPreference = "Stop"
 # A barra de progresso do Invoke-WebRequest (PowerShell 5.1) deixa o download
 # dezenas de vezes mais lento.
 $ProgressPreference = "SilentlyContinue"
+# GitHub (canal publico) exige TLS 1.2, que o PowerShell 5.1 nem sempre usa por padrao.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 $baseUrl = "__UPDATE_BASE_URL__"
 
 Write-Host "================================================================" -ForegroundColor Cyan

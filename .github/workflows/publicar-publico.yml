@@ -1,0 +1,114 @@
+name: Publicar no canal publico
+
+# Canal publico de atualizacao, para qualquer empresa instalar sem servidor:
+#   irm https://github.com/<dono>/<repo>/releases/latest/download/install.ps1 | iex
+#
+# Roda SO quando acionado (aba Actions > Run workflow): cada versao vai
+# primeiro para o canal principal (deploy.yml, pela VPS) e so depois de rodar
+# bem la e liberada aqui - o canal principal e o canario de todas as instalacoes.
+#
+# O pacote publico e generico: sem o repositorio de dados privado (nada de
+# fotos por hostname) e com o config.json apontando para o proprio Release.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+env:
+  CANAL_PUBLICO: https://github.com/${{ github.repository }}/releases/latest/download
+  UPDATE_BASE_URL: ${{ secrets.UPDATE_BASE_URL }}
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checar dados sensiveis
+        env:
+          SENSITIVE_PATTERNS: ${{ secrets.SENSITIVE_PATTERNS }}
+        run: |
+          printf '%s\n' "$SENSITIVE_PATTERNS" > "$RUNNER_TEMP/padroes.txt"
+          bash .github/scripts/checar-dados-sensiveis.sh "$RUNNER_TEMP/padroes.txt"
+
+      # So libera para o publico a versao que ja esta rodando no canal principal.
+      - name: Conferir que esta versao ja esta no canal principal
+        run: |
+          versao=$(tr -d '\r\n ' < dist_spooler/VERSION)
+          principal=$(curl -sf --max-time 15 "$UPDATE_BASE_URL/VERSION" | tr -d '\r\n ' || true)
+          echo "VERSION do repositorio: $versao | publicada no canal principal: ${principal:-indisponivel}"
+          if [ "$versao" != "$principal" ]; then
+            echo "ERRO: a versao $versao ainda nao esta no canal principal - publique pelo deploy e espere rodar bem antes de liberar."
+            exit 1
+          fi
+          if gh release view "v$versao" >/dev/null 2>&1; then
+            echo "ERRO: a versao $versao ja foi publicada no canal publico"; exit 1
+          fi
+          echo "VERSAO=$versao" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Gerar config.json do canal publico
+        run: |
+          python3 -c "import json, os; json.dump({'update_base_url': os.environ['CANAL_PUBLICO']}, open('dist_spooler/app/config.json', 'w'))"
+          test ! -d dist_spooler/app/photos || { echo "ERRO: fotos por hostname no pacote publico"; exit 1; }
+
+      - name: Gerar dist_spooler.zip
+        run: |
+          cd dist_spooler
+          zip -r ../dist_spooler.zip . -x ".*"
+          cd ..
+          python3 - <<'PYEOF'
+          import json, sys, zipfile
+          z = zipfile.ZipFile("dist_spooler.zip")
+          nomes = z.namelist()
+          ruins = [n for n in nomes if n.lower().endswith((".bat", ".cmd"))
+                   and (lambda b: b.count(b"\n") != b.count(b"\r\n"))(z.read(n))]
+          if ruins: sys.exit(f"ERRO: .bat sem CRLF no zip: {ruins}")
+          if any(n.startswith("app/photos/") and n.endswith(".png") for n in nomes): sys.exit("ERRO: foto por hostname no pacote publico")
+          if json.loads(z.read("app/config.json"))["update_base_url"].find("github.com") < 0: sys.exit("ERRO: config.json nao aponta para o GitHub")
+          print("OK - pacote generico:", len(nomes), "arquivos")
+          PYEOF
+
+      - name: Assinar pacote
+        shell: pwsh
+        env:
+          CHAVE_PRIVADA: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: |
+          $rsa = [System.Security.Cryptography.RSA]::Create()
+          $rsa.FromXmlString($env:CHAVE_PRIVADA)
+          $dados = [IO.File]::ReadAllBytes("dist_spooler.zip")
+          $sha = [System.Security.Cryptography.HashAlgorithmName]::SHA256
+          $pkcs1 = [System.Security.Cryptography.RSASignaturePadding]::Pkcs1
+          $assinatura = $rsa.SignData($dados, $sha, $pkcs1)
+          [IO.File]::WriteAllBytes("dist_spooler.zip.sig", $assinatura)
+          $ok = $false
+          foreach ($p in (Get-Content dist_spooler/app/assinatura-publica.json -Raw | ConvertFrom-Json).chaves) {
+            $v = [System.Security.Cryptography.RSA]::Create(); $v.FromXmlString($p)
+            if ($v.VerifyData($dados, $assinatura, $sha, $pkcs1)) { $ok = $true }
+          }
+          if (-not $ok) { Write-Error "ERRO: assinatura nao confere com assinatura-publica.json"; exit 1 }
+          Write-Host "OK - pacote assinado e conferido"
+
+      - name: Gerar install.ps1 e VERSION
+        run: |
+          sed "s|__UPDATE_BASE_URL__|$CANAL_PUBLICO|" deploy/install.ps1 > install.ps1
+          grep -q "__UPDATE_BASE_URL__" install.ps1 && { echo "ERRO: install.ps1 sem endereco"; exit 1; } || true
+          cp dist_spooler/VERSION VERSION
+
+      - name: Criar Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSAO" dist_spooler.zip dist_spooler.zip.sig VERSION install.ps1 \
+            --title "Spooler Manager $VERSAO" --latest \
+            --notes "Instalar (PowerShell): \`irm $CANAL_PUBLICO/install.ps1 | iex\` - as maquinas se atualizam sozinhas por este canal. Pacote assinado (verificado pelo atualizador)."
+
+      - name: Verificar publicacao
+        run: |
+          sleep 5
+          publicada=$(curl -sfL --max-time 30 "$CANAL_PUBLICO/VERSION" | tr -d '\r\n ')
+          echo "VERSION no canal publico: $publicada"
+          [ "$publicada" = "$VERSAO" ] || { echo "ERRO: canal publico nao serve a versao $VERSAO"; exit 1; }

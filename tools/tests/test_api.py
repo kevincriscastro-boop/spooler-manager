@@ -333,7 +333,7 @@ def test_chaves_publicas_de_assinatura():
 def test_installer_copies_signing_keys_on_update():
     # Sem as chaves, o AtualizarAgora novo recusa todo pacote e a maquina trava.
     bat = (REPO_ROOT / "dist_spooler" / "Instalar.bat").read_text(encoding="utf-8-sig")
-    ramo_atualizacao = bat.split('if exist "%TARGET_DIR%\data.json" (', 1)[1].split(") else (", 1)[0]
+    ramo_atualizacao = bat.split(r'if exist "%TARGET_DIR%\data.json" (', 1)[1].split(") else (", 1)[0]
     assert r'copy /y "app\assinatura-publica.json"' in ramo_atualizacao
 
 
@@ -355,6 +355,27 @@ def test_pacote_publicado_tem_assinatura_valida(tmp_path):
         (tmp_path / nome).write_bytes(resp.content)
     atualizador = (REPO_ROOT / "dist_spooler" / "app" / "AtualizarAgora.ps1").read_text(encoding="utf-8-sig")
     funcao = re.search(r"^function Test-AssinaturaPacote\b.*?^\}", atualizador, re.S | re.M).group(0)
-    script = funcao + f"\nTest-AssinaturaPacote '{tmp_path}\dist_spooler.zip' '{tmp_path}\dist_spooler.zip.sig' '{ARQUIVO_CHAVES}'"
+    zip_, sig = tmp_path / "dist_spooler.zip", tmp_path / "dist_spooler.zip.sig"
+    script = funcao + f"\nTest-AssinaturaPacote '{zip_}' '{sig}' '{ARQUIVO_CHAVES}'"
     saida = subprocess.run(["powershell", "-NoProfile", "-Command", script], capture_output=True, text=True, timeout=60).stdout.strip()
     assert saida == "OK", f"assinatura do pacote publicado: {saida}"
+
+
+# --------------------------------------------------------------------------
+# Canal publico (GitHub Releases): pacote generico, sem dados do ambiente principal
+# --------------------------------------------------------------------------
+
+def test_scripts_que_baixam_usam_tls12():
+    # O GitHub exige TLS 1.2; o PowerShell 5.1 nem sempre usa por padrao.
+    for arq in ("dist_spooler/app/AtualizarAgora.ps1", "dist_spooler/app/WatchdogSpooler.ps1",
+                "dist_spooler/app/SpoolerMonitor.ps1", "deploy/install.ps1"):
+        texto = (REPO_ROOT / arq).read_text(encoding="utf-8-sig")
+        assert "[Net.SecurityProtocolType]::Tls12" in texto, arq
+
+
+def test_canal_publico_nao_leva_dados_privados():
+    wf = (REPO_ROOT / ".github" / "workflows" / "publicar-publico.yml").read_text(encoding="utf-8")
+    assert "DADOS_REPO" not in wf and "DADOS_DEPLOY_KEY" not in wf  # nada do repositorio privado
+    assert "workflow_dispatch" in wf and "push:" not in wf           # so quando liberado manualmente
+    assert "ainda nao esta no canal principal" in wf                # so versao que ja rodou no canal principal
+    assert "releases/latest/download" in wf

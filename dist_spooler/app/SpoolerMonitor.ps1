@@ -34,6 +34,8 @@ $dataFile = Join-Path $AppDir "data.json"
 $dashFile = Join-Path $AppDir "dashboard.html"
 $coreScript = Join-Path $AppDir "LimparSpoolerCore.ps1"
 $versionFile = Join-Path $AppDir "VERSION"
+# GitHub (canal publico) exige TLS 1.2, que o PowerShell 5.1 nem sempre usa por padrao.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
 # Endereco do servidor de atualizacao vem do config.json (gerado pelo deploy,
 # fora do Git) - assim o codigo nao carrega o IP de nenhum ambiente real.
@@ -518,7 +520,7 @@ while ($listener.IsListening) {
                 $currentVersion = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw -ErrorAction SilentlyContinue).Trim() } else { "" }
                 try {
                     if (-not $updateBaseUrl) { throw "config.json sem update_base_url" }
-                    $remoteRaw = (Invoke-WebRequest -Uri "$updateBaseUrl/VERSION" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop).Content
+                    $remoteRaw = (Invoke-WebRequest -Uri "$updateBaseUrl/VERSION" -TimeoutSec 15 -UseBasicParsing -ErrorAction Stop).Content
                     $latestVersion = if ($remoteRaw -is [byte[]]) { [System.Text.Encoding]::UTF8.GetString($remoteRaw).Trim() } else { $remoteRaw.ToString().Trim() }
                     $updateAvailable = $latestVersion -and ($latestVersion -ne $currentVersion)
 

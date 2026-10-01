@@ -25,6 +25,8 @@ param(
 # A barra de progresso do Invoke-WebRequest no PowerShell 5.1 deixa o download
 # dezenas de vezes mais lento (mesmo com a janela escondida).
 $ProgressPreference = "SilentlyContinue"
+# GitHub (canal publico) exige TLS 1.2, que o PowerShell 5.1 nem sempre usa por padrao.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
 $logFile = Join-Path $PSScriptRoot "update.log"
 function Write-UpdateLog([string]$Mensagem) {

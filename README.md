@@ -92,7 +92,21 @@ Tudo roda em **PowerShell puro**, sem nada para instalar além do próprio pacot
 3. Abra o atalho **Painel Admin - Spooler** na Área de Trabalho. O login inicial é
    `admin` / `admin`.
 
-Com um servidor de atualização configurado (veja abaixo), dá para instalar com **um
+**Na sua empresa, com um comando só** (num PowerShell comum; ele pede o UAC sozinho).
+As máquinas passam a se atualizar sozinhas pelo canal público do GitHub, sem
+servidor nenhum, e **nenhum dado da sua empresa sai das suas máquinas**:
+
+```powershell
+irm https://github.com/kevincriscastro-boop/spooler-manager/releases/latest/download/install.ps1 | iex
+```
+
+> Se aparecer erro de conexão segura (Windows antigo), rode antes:
+> `[Net.ServicePointManager]::SecurityProtocol = 'Tls12'`
+
+Todo pacote é **assinado** e o atualizador só instala o que confere com a chave
+pública que vem no app.
+
+Com um servidor de atualização próprio (veja abaixo), dá para instalar com **um
 comando só**, num PowerShell comum. Ele pede o UAC sozinho:
 
 ```powershell

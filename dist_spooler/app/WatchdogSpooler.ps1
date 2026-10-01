@@ -32,6 +32,8 @@
     robusto pra essas maquinas.
 #>
 $AppDir = "C:\ProgramData\GerenciadorSpooler"
+# GitHub (canal publico) exige TLS 1.2, que o PowerShell 5.1 nem sempre usa por padrao.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
 # Endereco do servidor de atualizacao vem do config.json (ver SpoolerMonitor.ps1).
 $updateBaseUrl = $null
@@ -104,7 +106,7 @@ try {
 
         # O arquivo VERSION nao tem extensao, entao o servidor pode devolver o
         # conteudo como bytes (application/octet-stream) em vez de texto.
-        $remoteRaw = (Invoke-WebRequest -Uri "$updateBaseUrl/VERSION" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop).Content
+        $remoteRaw = (Invoke-WebRequest -Uri "$updateBaseUrl/VERSION" -TimeoutSec 15 -UseBasicParsing -ErrorAction Stop).Content
         if ($remoteRaw -is [byte[]]) {
             $remoteVersion = [System.Text.Encoding]::UTF8.GetString($remoteRaw).Trim()
         } else {

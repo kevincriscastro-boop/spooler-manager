@@ -89,3 +89,47 @@ Três proteções evitam esse cenário:
   `config.json` da lista de arquivos que o `Instalar.bat` copia nas atualizações.
 - **`test_published_zip_has_config_with_update_url`:** confere o zip que está de
   fato publicado na VPS.
+
+---
+
+# Pacote recusado pela assinatura
+
+Desde a versão `2026.10.01.1`, o atualizador só instala pacotes **assinados pelo
+deploy**: a chave privada fica no secret `UPDATE_SIGNING_KEY` do GitHub, e cada
+máquina confere a assinatura com as chaves **públicas** de
+`dist_spooler/app/assinatura-publica.json`. Na dúvida, ele não instala nada.
+
+## Sintoma
+
+No `update.log` da máquina (ou em `GET /api/update-log`):
+
+| Mensagem | Significado | O que fazer |
+|---|---|---|
+| `assinatura INVALIDA` | O pacote foi alterado no caminho, ou foi assinado com uma chave que a máquina não conhece | Se ninguém trocou a chave: **trate como incidente**: alguém pode estar adulterando o pacote entre a máquina e o servidor. Se a chave foi trocada: veja "Trocar a chave" |
+| `assinatura SEM_ASSINATURA` | O servidor não tem `dist_spooler.zip.sig` | Rode o workflow **Publicar na VPS** de novo |
+| `assinatura SEM_CHAVES` | A máquina não tem `assinatura-publica.json` | Reinstale pelo `install.ps1` ou copie o arquivo para `C:\ProgramData\GerenciadorSpooler\` |
+| `versao ... e mais antiga que a instalada` | O servidor está com um pacote anterior ao instalado | Publique uma versão nova (o `VERSION` precisa ser maior) |
+
+## Trocar a chave (ex: a privada vazou)
+
+1. Rode `tools/gerar-chave-assinatura.ps1` (repositório de dados). Ele gera um par
+   novo, troca o secret `UPDATE_SIGNING_KEY` e põe a chave pública nova na frente
+   de `assinatura-publica.json`.
+2. **Se a troca é por vazamento**, apague a chave antiga do
+   `assinatura-publica.json` antes de publicar, para ninguém mais conseguir
+   assinar um pacote que as máquinas aceitem.
+3. Publique uma versão (suba o `VERSION`).
+4. As máquinas que ainda só conhecem a chave antiga vão **recusar** essa versão
+   (`assinatura INVALIDA` no `update.log`). Nelas, rode o instalador de um
+   comando, que instala sem depender da chave anterior:
+
+   ```powershell
+   irm http://seu-servidor:8990/install.ps1 | iex
+   ```
+
+   Pelo AnyDesk dá para fazer isso mesmo com a máquina offline no Spooler Manager.
+
+> **Limitação conhecida:** com uma única chave no secret, não existe troca
+> "suave" (as máquinas receberem a chave nova antes de a antiga deixar de valer).
+> Numa frota pequena, reinstalar as que recusarem é o caminho mais simples. Se a
+> frota crescer, dá para o deploy assinar com duas chaves durante a transição.

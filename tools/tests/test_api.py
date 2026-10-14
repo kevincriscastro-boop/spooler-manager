@@ -379,3 +379,12 @@ def test_canal_publico_nao_leva_dados_privados():
     assert "workflow_dispatch" in wf and "push:" not in wf           # so quando liberado manualmente
     assert "ainda nao esta no canal principal" in wf                # so versao que ja rodou no canal principal
     assert "releases/latest/download" in wf
+
+
+def test_deploy_nunca_apaga_arquivos_na_vps():
+    # A pasta do site na VPS e compartilhada com outro projeto (etiqueta/):
+    # o deploy do Spooler so pode COPIAR arquivos, nunca apagar ou sincronizar.
+    wf = (REPO_ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+    codigo = "\n".join(l for l in wf.splitlines() if not l.strip().startswith("#"))
+    for proibido in ("rsync", "--delete", "rm -rf", "rm -r ", "ssh -i"):
+        assert proibido not in codigo, f"deploy.yml usa '{proibido}' - risco de apagar arquivos de outro projeto na VPS"

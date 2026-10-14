@@ -134,6 +134,10 @@ jobs:
 
       # VERSION por ultimo: as maquinas so enxergam a versao nova quando o
       # pacote (e o instalador) ja estao no lugar.
+      #
+      # So COPIA arquivos (scp): a pasta do site na VPS e compartilhada com
+      # outro projeto (subpasta etiqueta/). Nunca usar rsync --delete nem
+      # limpar a pasta - coberto por teste em tools/tests/test_api.py.
       - name: Publicar zip, install.ps1 e VERSION na VPS
         run: |
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \

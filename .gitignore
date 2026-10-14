@@ -24,6 +24,9 @@ scratchpad/
 # depois de lida na sessao nova
 HANDOFF.md
 
+# Anotacoes pessoais de uso do Claude Code (sincronizadas pelo OneDrive)
+NOTAS.md
+
 # Artefatos das ferramentas Python em tools/ (testes e script de fotos)
 tools/__pycache__/
 tools/**/__pycache__/
